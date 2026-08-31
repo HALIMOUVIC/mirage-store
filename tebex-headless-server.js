@@ -3617,7 +3617,12 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '                var response = await fetch("/api/create-checkout", {' +
 '                    method: "POST",' +
 '                    headers: { "Content-Type": "application/json" },' +
-'                    body: JSON.stringify({ packageId: packageId, basketId: basketId, returnBaseUrl: window.location.origin })' +
+'                    body: JSON.stringify({ ' +
+'                        packageId: packageId, ' +
+'                        basketId: basketId, ' +
+'                        returnBaseUrl: window.location.origin, ' +
+'                        returnPath: window.location.pathname' +
+'                    })' +
 '                });' +
 '                var data = await response.json();' +
 '                if (data.basketIdent) {' +
@@ -3657,8 +3662,10 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '                    }' +
 '                }' +
 '                renderCfxUser(savedUser);' +
+'                return savedUser;' +
 '            } catch (err) {' +
 '                console.warn("CFX User Init Error:", err);' +
+'                return null;' +
 '            }' +
 '        }' +
 '        function renderCfxUser(user) {' +
@@ -3686,7 +3693,11 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '                var res = await fetch("/api/create-checkout", {' +
 '                    method: "POST",' +
 '                    headers: { "Content-Type": "application/json" },' +
-'                    body: JSON.stringify({ packageId: ' + p.id + ', returnBaseUrl: window.location.origin })' +
+'                    body: JSON.stringify({ ' +
+'                        packageId: ' + p.id + ', ' +
+'                        returnBaseUrl: window.location.origin,' +
+'                        returnPath: window.location.pathname' +
+'                    })' +
 '                });' +
 '                var data = await res.json();' +
 '                if (data && data.authUrl) { window.location.href = data.authUrl; }' +
@@ -3704,7 +3715,16 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '            window.location.reload();' +
 '        }' +
 '        window.addEventListener("DOMContentLoaded", function() {' +
-'            initCfxUser();' +
+'            initCfxUser().then(function() {' +
+'                var urlParams = new URLSearchParams(window.location.search);' +
+'                if (urlParams.get("autoCheckout") === "1" && urlParams.get("basketId")) {' +
+'                    if (window.history.replaceState) {' +
+'                        var cleanUrl = window.location.pathname + "?basketId=" + encodeURIComponent(urlParams.get("basketId"));' +
+'                        window.history.replaceState(null, null, cleanUrl);' +
+'                    }' +
+'                    initiateBuy(' + p.id + ');' +
+'                }' +
+'            });' +
 '            var sEl = document.getElementById("sliderViewerContainer");' +
 '            if (sEl) {' +
 '                sEl.addEventListener("touchstart", function(e) { touchStartX = e.changedTouches[0].screenX; }, {passive: true});' +
@@ -3964,7 +3984,7 @@ app.post('/api/admin/save', verifyAdminToken, (req, res) => {
 // Headless Checkout Creation Endpoint
 app.post('/api/create-checkout', async (req, res) => {
     try {
-        const { basketId, packageId, returnBaseUrl } = req.body || {};
+        const { basketId, packageId, returnBaseUrl, returnPath } = req.body || {};
         const targetPackageId = packageId || NOTARY_PACKAGE_ID;
         let basketIdent = basketId;
 
@@ -3977,14 +3997,18 @@ app.post('/api/create-checkout', async (req, res) => {
         }
         if (!liveOrigin.startsWith('http')) liveOrigin = `https://${liveOrigin}`;
 
+        // Compute exact page return path (e.g. /package/7642742)
+        let exactPath = returnPath || (targetPackageId ? `/package/${targetPackageId}` : '/');
+        if (!exactPath.startsWith('/')) exactPath = `/${exactPath}`;
+
         if (!basketIdent) {
-            console.log(`[API] Creating new Tebex Headless basket for origin: ${liveOrigin}...`);
+            console.log(`[API] Creating new Tebex Headless basket for origin: ${liveOrigin}${exactPath}...`);
             const basketReq = await fetch(`https://headless.tebex.io/api/accounts/${TEBEX_PUBLIC_TOKEN}/baskets`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    complete_url: `${liveOrigin}/`,
-                    cancel_url: `${liveOrigin}/`
+                    complete_url: `${liveOrigin}${exactPath}`,
+                    cancel_url: `${liveOrigin}${exactPath}`
                 })
             });
 
@@ -4013,9 +4037,9 @@ app.post('/api/create-checkout', async (req, res) => {
 
         const packageData = await packageReq.json().catch(() => null);
 
-        if (packageReq.status === 422 && (packageData?.detail?.toLowerCase().includes('login') || packageData?.title?.toLowerCase().includes('payload'))) {
-            console.log(`[API] User login required for FiveM package. Fetching auth links for ${liveOrigin}...`);
-            const encodedReturnUrl = encodeURIComponent(`${liveOrigin}/?basketId=${basketIdent}`);
+        if (packageReq.status === 422 && (packageData?.detail?.toLowerCase().includes('login') || packageData?.title?.toLowerCase().includes('payload') || packageData?.detail?.toLowerCase().includes('auth'))) {
+            console.log(`[API] User login required for FiveM package. Fetching auth links for ${liveOrigin}${exactPath}...`);
+            const encodedReturnUrl = encodeURIComponent(`${liveOrigin}${exactPath}?basketId=${basketIdent}&autoCheckout=1`);
             const authReq = await fetch(`https://headless.tebex.io/api/accounts/${TEBEX_PUBLIC_TOKEN}/baskets/${basketIdent}/auth?returnUrl=${encodedReturnUrl}`);
             const authData = await authReq.json().catch(() => []);
             const authUrl = authData?.[0]?.url;
