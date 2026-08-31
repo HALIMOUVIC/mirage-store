@@ -4256,6 +4256,25 @@ app.get('/api/user/profile', async (req, res) => {
         if (data && data.data) {
             const username = data.data.username || data.data.customer?.username || data.data.creator_code?.name;
             if (username) {
+                const config = loadStoreConfig();
+                if (!config.realPayments) config.realPayments = [];
+                const alreadyExists = config.realPayments.some(p => p.id === ('tbx-' + basketId) || (p.buyer.toLowerCase() === username.toLowerCase() && p.time === 'Just now'));
+                if (!alreadyExists && data.data.packages?.length > 0) {
+                    const priceFormatted = (data.data.base_price !== undefined ? '$' + Number(data.data.base_price).toFixed(2) : '$0.00') + ' USD';
+                    const newPay = {
+                        id: 'tbx-' + basketId,
+                        buyer: username,
+                        item: data.data.packages[0].name || 'Notary System',
+                        price: priceFormatted,
+                        time: 'Just now',
+                        avatar: `https://forum.cfx.re/user_avatar/forum.cfx.re/${encodeURIComponent(username)}/120/1.png`
+                    };
+                    config.realPayments.unshift(newPay);
+                    saveStoreConfig(config);
+                    cachedStoreData = null;
+                    broadcastEvent('payment_received', newPay);
+                }
+
                 return res.json({
                     loggedIn: true,
                     username: username,
