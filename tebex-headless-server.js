@@ -3332,46 +3332,14 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '        .trust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; padding-top: 0.4rem; border-top: 1px solid var(--card-border); }' +
 '        .trust-item { display: flex; align-items: center; gap: 0.45rem; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }' +
 '        .trust-item svg { color: var(--brand-light); flex-shrink: 0; }' +
-'        /* Professional Tabs System */' +
-'        .tabs-wrapper { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; overflow: hidden; margin-bottom: 2.5rem; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35); }' +
-'        .tabs-header { display: flex; border-bottom: 1px solid var(--card-border); background: rgba(13, 21, 38, 0.9); overflow-x: auto; padding: 0.35rem 0.5rem 0; gap: 0.4rem; }' +
-'        .tab-btn { padding: 0.75rem 1.25rem; background: transparent; border: none; border-radius: 10px 10px 0 0; border-bottom: 2px solid transparent; color: var(--text-muted); font-size: 0.82rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; white-space: nowrap; }' +
-'        .tab-btn:hover { color: #ffffff; background: rgba(255, 255, 255, 0.04); }' +
-'        .tab-btn.active { color: var(--brand-light); border-bottom: 2px solid var(--brand-light); background: rgba(2, 132, 199, 0.12); }' +
-'        .tab-badge { font-size: 0.65rem; background: rgba(56, 189, 248, 0.18); color: #38bdf8; padding: 0.15rem 0.45rem; border-radius: 6px; font-weight: 800; }' +
-'        .tab-content { padding: 1.5rem; font-size: 0.85rem; color: var(--text-body); line-height: 1.65; }' +
-'        .tab-pane { display: none; }' +
-'        .tab-pane.active { display: block; }' +
-'        /* Highlights Grid */' +
-'        .highlights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.85rem; margin-bottom: 1.25rem; }' +
-'        .hl-card { background: var(--card-inner); border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem 1rem; display: flex; align-items: flex-start; gap: 0.75rem; }' +
-'        .hl-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(2, 132, 199, 0.18); color: var(--brand-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.95rem; }' +
-'        .hl-title { font-size: 0.8rem; font-weight: 800; color: #ffffff; line-height: 1.2; margin-bottom: 0.15rem; }' +
-'        .hl-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.35; }' +
-'        /* Description scroll box */' +
-'        .desc-scroll-box { max-height: 380px; overflow-y: auto; padding-right: 0.65rem; background: rgba(11, 18, 33, 0.6); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.25rem; }' +
-'        .desc-scroll-box p { margin-bottom: 0.85rem; color: var(--text-body); }' +
-'        .desc-scroll-box ul, .desc-scroll-box ol { margin-left: 1.25rem; margin-bottom: 0.85rem; }' +
-'        .desc-scroll-box li { margin-bottom: 0.35rem; color: var(--text-body); }' +
-'        /* Video Showcase Cinema Box */' +
-'        .cinema-box { background: #070b14; border: 1px solid var(--card-border); border-radius: 14px; overflow: hidden; }' +
-'        .cinema-bar { background: rgba(13, 21, 38, 0.9); padding: 0.6rem 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); font-size: 0.75rem; font-weight: 700; color: var(--text-muted); }' +
-'        .cinema-dots { display: flex; gap: 0.35rem; }' +
-'        .cinema-dot { width: 10px; height: 10px; border-radius: 50%; }' +
-'        .dot-red { background: #ef4444; } .dot-yellow { background: #f59e0b; } .dot-green { background: #10b981; }' +
-'        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; }' +
-'        .video-wrapper iframe { position: absolute; top:0; left:0; width:100%; height:100%; }' +
-'        .video-footer-tip { padding: 0.65rem 1rem; background: rgba(13, 21, 38, 0.7); font-size: 0.74rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; border-top: 1px solid var(--card-border); }' +
-'        /* Installation Guide Step Cards */' +
-'        .steps-container { display: flex; flex-direction: column; gap: 0.85rem; max-height: 420px; overflow-y: auto; padding-right: 0.5rem; }' +
-'        .step-item { background: var(--card-inner); border: 1px solid var(--card-border); border-radius: 12px; padding: 1rem 1.15rem; display: flex; gap: 0.85rem; align-items: flex-start; }' +
-'        .step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--brand); color: #fff; font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.1rem; }' +
-'        .step-body { flex-grow: 1; }' +
-'        .step-title { font-size: 0.84rem; font-weight: 800; color: #fff; margin-bottom: 0.25rem; }' +
-'        .step-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; }' +
-'        .code-box { margin-top: 0.5rem; background: #060a12; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 0.55rem 0.85rem; display: flex; justify-content: space-between; align-items: center; font-family: monospace; font-size: 0.8rem; color: #38bdf8; }' +
-'        .btn-copy { background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }' +
-'        .btn-copy:hover { background: var(--brand); color: #fff; }' +
+'        .desc-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; overflow: hidden; margin-bottom: 2.5rem; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35); }' +
+'        .desc-card-header { background: rgba(13, 21, 38, 0.9); padding: 0.85rem 1.35rem; border-bottom: 1px solid var(--card-border); display: flex; align-items: center; justify-content: space-between; }' +
+'        .desc-card-title { display: flex; align-items: center; gap: 0.5rem; font-size: 0.92rem; font-weight: 800; color: #ffffff; }' +
+'        .desc-card-title svg { color: var(--brand-light); }' +
+'        .desc-card-body { padding: 1.5rem; font-size: 0.85rem; color: var(--text-body); line-height: 1.7; max-height: 480px; overflow-y: auto; }' +
+'        .desc-card-body p { margin-bottom: 0.85rem; color: var(--text-body); }' +
+'        .desc-card-body ul, .desc-card-body ol { margin-left: 1.25rem; margin-bottom: 0.85rem; }' +
+'        .desc-card-body li { margin-bottom: 0.35rem; color: var(--text-body); }' +
 '        .section-header { margin-bottom: 1.25rem; font-size: 1.15rem; font-weight: 800; color: #ffffff; letter-spacing: -0.01em; }' +
 '        .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem; }' +
 '        .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; overflow: hidden; transition: all 0.25s ease; display: flex; flex-direction: column; }' +
@@ -3471,7 +3439,6 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '                    <div class="slider-content" id="mainViewer" onclick="handleMainViewerClick()">' +
 '                        <img id="mainImg" src="' + sliderMediaItems[0].url + '" alt="' + p.name + '" />' +
 '                    </div>' +
-'                    <!-- Floating Slider Prev/Next Arrows -->' +
 '                    <button class="slider-nav-btn slider-prev-btn" onclick="sliderPrev(event)" aria-label="Previous photo">' +
 '                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>' +
 '                    </button>' +
@@ -3479,7 +3446,6 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>' +
 '                    </button>' +
 '                </div>' +
-'                <!-- Thumbnail Carousel with Arrows -->' +
 '                <div class="thumb-carousel-wrapper">' +
 '                    <button class="thumb-scroll-btn" onclick="scrollThumbs(-150)" aria-label="Scroll thumbnails left">' +
 '                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>' +
@@ -3530,111 +3496,16 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '                </div>' +
 '            </div>' +
 '        </div>' +
-'        <!-- ================= TABS WRAPPER ================= -->' +
-'        <div class="tabs-wrapper">' +
-'            <div class="tabs-header">' +
-'                <button class="tab-btn active" onclick="switchTab(\'desc\', this)">' +
-'                    <svg width="15" height="15" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg>' +
-'                    <span>Overview & Features</span>' +
-'                </button>' +
-'                <button class="tab-btn" onclick="switchTab(\'video\', this)">' +
-'                    <svg width="15" height="15" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/></svg>' +
-'                    <span>Video Showcase</span>' +
-'                    <span class="tab-badge">4K 60FPS</span>' +
-'                </button>' +
-'                <button class="tab-btn" onclick="switchTab(\'docs\', this)">' +
-'                    <svg width="15" height="15" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>' +
-'                    <span>Installation Guide</span>' +
-'                    <span class="tab-badge">Quick Setup</span>' +
-'                </button>' +
+'        <!-- ================= PRODUCT DESCRIPTION SECTION ================= -->' +
+'        <div class="desc-card">' +
+'            <div class="desc-card-header">' +
+'                <div class="desc-card-title">' +
+'                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg>' +
+'                    <span>Product Description & Features</span>' +
+'                </div>' +
 '            </div>' +
-'            <div class="tab-content">' +
-'                <!-- Tab 1: Overview & Features -->' +
-'                <div class="tab-pane active" id="tab-desc">' +
-'                    <div class="highlights-grid">' +
-'                        <div class="hl-card">' +
-'                            <div class="hl-icon">⚡</div>' +
-'                            <div><div class="hl-title">' + p.resmon + ' Resmon</div><div class="hl-desc">Ultra-optimized loop execution for peak server performance.</div></div>' +
-'                        </div>' +
-'                        <div class="hl-card">' +
-'                            <div class="hl-icon">🛡️</div>' +
-'                            <div><div class="hl-title">CFX.re Escrow</div><div class="hl-desc">Official encrypted asset protection directly into your Keymaster.</div></div>' +
-'                        </div>' +
-'                        <div class="hl-card">' +
-'                            <div class="hl-icon">⚙️</div>' +
-'                            <div><div class="hl-title">' + p.framework + '</div><div class="hl-desc">Pre-configured hooks & ready for immediate drag-and-drop.</div></div>' +
-'                        </div>' +
-'                        <div class="hl-card">' +
-'                            <div class="hl-icon">🔄</div>' +
-'                            <div><div class="hl-title">Lifetime Updates</div><div class="hl-desc">Free continuous feature additions & Discord customer support.</div></div>' +
-'                        </div>' +
-'                    </div>' +
-'                    <div class="desc-scroll-box custom-scroll">' +
-'                        <div style="font-size: 0.85rem; line-height: 1.65; color: var(--text-body);">' + p.fullDesc + '</div>' +
-'                    </div>' +
-'                </div>' +
-'                <!-- Tab 2: Video Showcase -->' +
-'                <div class="tab-pane" id="tab-video">' +
-'                    <div class="cinema-box">' +
-'                        <div class="cinema-bar">' +
-'                            <div class="cinema-dots">' +
-'                                <div class="cinema-dot dot-red"></div>' +
-'                                <div class="cinema-dot dot-yellow"></div>' +
-'                                <div class="cinema-dot dot-green"></div>' +
-'                            </div>' +
-'                            <span>Official Gameplay Showcase • 1080p 60FPS</span>' +
-'                            <span style="color:#38bdf8;">' + p.categoryName + '</span>' +
-'                        </div>' +
-'                        <div class="video-wrapper">' +
-'                            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/' + (p.youtubeUrl ? (p.youtubeUrl.includes('v=') ? p.youtubeUrl.split('v=')[1].split('&')[0] : p.youtubeUrl.split('/').pop()) : 'M7lc1UVf-VE') + '?enablejsapi=1&rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>' +
-'                        </div>' +
-'                        <div class="video-footer-tip">' +
-'                            <svg width="15" height="15" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>' +
-'                            <span>Tip: You can switch between screenshots and video trailer anytime using the media strip at the top.</span>' +
-'                        </div>' +
-'                    </div>' +
-'                </div>' +
-'                <!-- Tab 3: Installation Guide -->' +
-'                <div class="tab-pane" id="tab-docs">' +
-'                    <div class="steps-container custom-scroll">' +
-'                        <div class="step-item">' +
-'                            <div class="step-num">1</div>' +
-'                            <div class="step-body">' +
-'                                <div class="step-title">Claim Asset on Keymaster</div>' +
-'                                <div class="step-desc">After completing checkout, go to <a href="https://keymaster.fivem.net/assets" target="_blank" style="color:#38bdf8;text-decoration:underline;">keymaster.fivem.net/assets</a> and download your asset bundle.</div>' +
-'                            </div>' +
-'                        </div>' +
-'                        <div class="step-item">' +
-'                            <div class="step-num">2</div>' +
-'                            <div class="step-body">' +
-'                                <div class="step-title">Extract into Resources Folder</div>' +
-'                                <div class="step-desc">Extract the folder directly into your server\'s <code>resources/[mirage]/</code> directory.</div>' +
-'                            </div>' +
-'                        </div>' +
-'                        <div class="step-item">' +
-'                            <div class="step-num">3</div>' +
-'                            <div class="step-body">' +
-'                                <div class="step-title">Add to server.cfg</div>' +
-'                                <div class="step-desc">Add the ensure command into your server configuration file:</div>' +
-'                                <div class="code-box">' +
-'                                    <span id="cfgEnsureCode">ensure ' + resourceName + '</span>' +
-'                                    <button class="btn-copy" onclick="copyCode(\'ensure ' + resourceName + '\', this)">Copy</button>' +
-'                                </div>' +
-'                            </div>' +
-'                        </div>' +
-'                        <div class="step-item">' +
-'                            <div class="step-num">4</div>' +
-'                            <div class="step-body">' +
-'                                <div class="step-title">Configure & Restart</div>' +
-'                                <div class="step-desc">Customize settings in <code>config.lua</code> to match your server frameworks/economy and restart your server.</div>' +
-'                            </div>' +
-'                        </div>' +
-'                        <div style="margin-top:0.75rem;padding:1rem;background:rgba(11,18,33,0.6);border:1px solid var(--card-border);border-radius:10px;">' +
-'                            <div style="font-weight:800;color:#fff;margin-bottom:0.5rem;font-size:0.82rem;">Additional Technical Documentation:</div>' +
-'                            <div style="font-size:0.82rem;color:var(--text-body);">' + formattedDocs + '</div>' +
-'                        </div>' +
-'                    </div>' +
-'                </div>' +
+'            <div class="desc-card-body custom-scroll">' +
+'                ' + p.fullDesc + '' +
 '            </div>' +
 '        </div>' +
 '        <h2 class="section-header">You May Also Like</h2>' +
@@ -3732,28 +3603,6 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '        if (sliderEl) {' +
 '            sliderEl.addEventListener("touchstart", function(e) { touchStartX = e.changedTouches[0].screenX; }, {passive: true});' +
 '            sliderEl.addEventListener("touchend", function(e) { var touchEndX = e.changedTouches[0].screenX; if (touchEndX < touchStartX - 40) sliderNext(); if (touchEndX > touchStartX + 40) sliderPrev(); }, {passive: true});' +
-'        }' +
-'        function switchTab(tabId, element) {' +
-'            document.querySelectorAll(".tab-btn").forEach(function(btn) { btn.classList.remove("active"); });' +
-'            document.querySelectorAll(".tab-pane").forEach(function(pane) { pane.classList.remove("active"); });' +
-'            if (element) element.classList.add("active");' +
-'            var target = document.getElementById("tab-" + tabId);' +
-'            if (target) target.classList.add("active");' +
-'        }' +
-'        function copyCode(text, btn) {' +
-'            navigator.clipboard.writeText(text).then(function() {' +
-'                var originalText = btn.innerText;' +
-'                btn.innerText = "✓ Copied!";' +
-'                btn.style.background = "#10b981";' +
-'                btn.style.borderColor = "#10b981";' +
-'                btn.style.color = "#ffffff";' +
-'                setTimeout(function() {' +
-'                    btn.innerText = originalText;' +
-'                    btn.style.background = "rgba(56, 189, 248, 0.15)";' +
-'                    btn.style.borderColor = "rgba(56, 189, 248, 0.3)";' +
-'                    btn.style.color = "#38bdf8";' +
-'                }, 2000);' +
-'            }).catch(function() { alert("Copied: " + text); });' +
 '        }' +
 '        async function initiateBuy(packageId) {' +
 '            var btn = document.getElementById("buyBtn");' +
