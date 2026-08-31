@@ -125,14 +125,7 @@ function loadStoreConfig() {
         discordUrl: "https://discord.gg/fivem",
         topSupporter: { name: "URSU ARTS", title: "Top Supporter of the Month", amount: "$240.00" },
         packages: {},
-        customReviews: [],
-        realPayments: [
-            { id: "tbx-94812", buyer: "Alex_V", item: "[Escrow] Notary System v2.0", time: "Today 14:22", price: "35.00 USD", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80" },
-            { id: "tbx-94811", buyer: "Marcus_K", item: "Onyx Luxury Dealership MLO", time: "Today 12:15", price: "45.00 USD", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&auto=format&fit=crop&q=80" },
-            { id: "tbx-94810", buyer: "Chief_Vance", item: "NextGen Police MDT / CAD", time: "Today 10:50", price: "40.00 USD", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" },
-            { id: "tbx-94809", buyer: "GhostRider_99", item: "Underground Supercar Pack", time: "Yesterday 23:10", price: "55.00 USD", avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100&auto=format&fit=crop&q=80" },
-            { id: "tbx-94808", buyer: "Apex_Roleplay", item: "[Escrow] Notary System v2.0", time: "Yesterday 18:30", price: "35.00 USD", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" }
-        ]
+        customReviews: []
     };
 }
 
@@ -344,7 +337,7 @@ async function syncTebexStore(force = false) {
 
         const allReviews = [...(config.customReviews || []), ...defaultReviews];
         const paymentMap = new Map();
-        [...inMemoryLivePayments, ...(config.realPayments || []), ...liveTebexPayments].forEach(p => {
+        [...inMemoryLivePayments, ...liveTebexPayments].forEach(p => {
             if (p && p.buyer && !paymentMap.has(p.id || (p.buyer + p.item))) {
                 paymentMap.set(p.id || (p.buyer + p.item), p);
             }
