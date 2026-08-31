@@ -2100,8 +2100,11 @@ const storefrontHTML = `<!DOCTYPE html>
         }
 
         function openModal(productId) {
-            const p = storeProducts.find(item => item.id === productId);
-            if (!p) return;
+            const p = storeProducts.find(item => String(item.id) === String(productId));
+            if (!p) {
+                console.warn('Product not found:', productId);
+                return;
+            }
             currentSelectedProduct = p;
 
             const strip = document.getElementById('thumbnailsStrip');
@@ -2113,7 +2116,7 @@ const storefrontHTML = `<!DOCTYPE html>
                 p.media.forEach((imgUrl, idx) => {
                     const thumb = document.createElement('div');
                     thumb.className = 'thumb-item' + (idx === 0 ? ' active' : '');
-                    thumb.innerHTML = \`<img src="\${imgUrl}" alt="Thumb" />\`;
+                    thumb.innerHTML = `<img src="${imgUrl}" alt="Thumb" />`;
                     thumb.onclick = () => {
                         document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
                         thumb.classList.add('active');
@@ -2153,15 +2156,15 @@ const storefrontHTML = `<!DOCTYPE html>
             const viewer = document.getElementById('mediaViewer');
             if (type === 'video') {
                 const embedUrl = getYouTubeEmbed(url);
-                viewer.innerHTML = \`<iframe width="100%" height="100%" src="\${embedUrl}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>\`;
+                viewer.innerHTML = `<iframe width="100%" height="100%" src="${embedUrl}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
             } else {
-                viewer.innerHTML = \`<img id="mainMediaImg" src="\${url}" alt="Showcase" />\`;
+                viewer.innerHTML = `<img id="mainMediaImg" src="${url}" alt="Showcase" />`;
             }
         }
 
         function getYouTubeEmbed(url) {
             if (!url) return '';
-            const match = url.match(/(?:youtu\\.be\\/|youtube\\.com\\/(?:embed\\/|v\\/|watch\\?v=|watch\\?.+&v=))([\\w-]{11})/);
+            const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
             return match ? 'https://www.youtube-nocookie.com/embed/' + match[1] : url;
         }
 
@@ -2203,6 +2206,14 @@ const storefrontHTML = `<!DOCTYPE html>
                 btnText.innerText = 'Creating Basket...';
             }
 
+            // Show interactive feedback
+            const alertEl = document.getElementById('modalAlert');
+            if (fromModal && alertEl) {
+                alertEl.innerText = '⚡ Connecting to Tebex Headless API...';
+                alertEl.className = 'modal-alert info';
+                alertEl.style.display = 'block';
+            }
+
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 const basketId = urlParams.get('basketId') || sessionStorage.getItem('tebex_basket_id');
@@ -2223,15 +2234,12 @@ const storefrontHTML = `<!DOCTYPE html>
                 }
 
                 if (data.requiresAuth && data.authUrl) {
-                    if (fromModal) {
-                        const alert = document.getElementById('modalAlert');
-                        alert.innerText = 'Redirecting to FiveM / CFX.re authentication to bind your license...';
-                        alert.className = 'modal-alert info';
-                        alert.style.display = 'block';
+                    if (alertEl) {
+                        alertEl.innerText = '🔑 Redirecting to CFX.re / FiveM authentication...';
+                        alertEl.className = 'modal-alert info';
+                        alertEl.style.display = 'block';
                     }
-                    setTimeout(() => {
-                        window.location.href = data.authUrl;
-                    }, 1000);
+                    window.location.href = data.authUrl;
                     return;
                 }
 
@@ -2243,7 +2251,7 @@ const storefrontHTML = `<!DOCTYPE html>
                     closeModal();
                     launchTebexCheckout(data.checkoutUrl, data.basketIdent);
                 } else {
-                    alert("Checkout Error: " + (data.error || "Failed to create checkout session"));
+                    alert("Checkout Error: " + (data.error || "Package not found on Tebex or failed to create checkout"));
                 }
             } catch (error) {
                 console.error("Checkout Error:", error);
