@@ -352,9 +352,10 @@ async function syncTebexStore() {
         }
 
         const allReviews = [...(config.customReviews || []), ...defaultReviews];
-        const allPayments = liveTebexPayments.length > 0 
-            ? liveTebexPayments 
-            : ((config.realPayments && config.realPayments.length > 0) ? config.realPayments : []);
+        const allPayments = [
+            ...(config.realPayments || []),
+            ...liveTebexPayments
+        ];
 
         cachedStoreData = {
             announcement: config.announcement,
@@ -2188,7 +2189,7 @@ const storefrontHTML = `<!DOCTYPE html>
                 row.className = 'payment-row';
                 row.innerHTML = \`
                     <div class="payment-user">
-                        <img class="payment-avatar" src="\${p.avatar}" alt="\${p.buyer}" />
+                        <img class="payment-avatar" src="\${p.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'}" alt="\${p.buyer}" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'" />
                         <div class="payment-info">
                             <div class="name">\${p.buyer}</div>
                             <div class="item">\${p.item}</div>
