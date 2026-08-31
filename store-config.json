@@ -51,31 +51,5 @@
       "productName": "Notary System",
       "comment": "Incredible work on the tablet UI. Very smooth animations and zero resmon."
     }
-  ],
-  "realPayments": [
-    {
-      "id": "tbx-83224226a75095-8528dd",
-      "buyer": "Hermes_Talal",
-      "item": "Notary System",
-      "price": "$0.00 USD",
-      "time": "Just now",
-      "avatar": "https://forum.cfx.re/user_avatar/forum.cfx.re/Hermes_Talal/120/1.png"
-    },
-    {
-      "id": "tbx-36624225a70747-08c285",
-      "buyer": "Mg_ZoDiAk",
-      "item": "Notary System",
-      "price": "$30.00 USD",
-      "time": "1h ago",
-      "avatar": "https://forum.cfx.re/user_avatar/forum.cfx.re/Mg_ZoDiAk/120/1.png"
-    },
-    {
-      "id": "tbx-66424225a70390-1454d7",
-      "buyer": "Mg_ZoDiAk",
-      "item": "Notary System",
-      "price": "$30.00 USD",
-      "time": "1h ago",
-      "avatar": "https://forum.cfx.re/user_avatar/forum.cfx.re/Mg_ZoDiAk/120/1.png"
-    }
   ]
 }
