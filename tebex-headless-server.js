@@ -774,18 +774,38 @@ const storefrontHTML = `<!DOCTYPE html>
         .hero-container {
             position: relative;
             z-index: 10;
-            max-width: 1380px;
+            max-width: 1560px;
             margin: 0 auto;
-            padding: 4rem 1.5rem;
+            padding: 4.5rem 2.5rem;
             width: 100%;
-            display: grid;
-            grid-template-columns: 1.45fr 0.7fr;
-            gap: 2.5rem;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
+            gap: 2.5rem;
         }
 
-        @media (max-width: 960px) {
-            .hero-container { grid-template-columns: 1fr; }
+        .hero-left-content {
+            max-width: 640px;
+            flex-shrink: 0;
+        }
+
+        .hero-right-widget {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 1100px) {
+            .hero-container {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 3rem 1.5rem;
+            }
+            .hero-right-widget {
+                width: 100%;
+                justify-content: flex-start;
+            }
             .gta-hero { min-height: auto; }
         }
 
@@ -1774,7 +1794,7 @@ const storefrontHTML = `<!DOCTYPE html>
     <section class="gta-hero">
         <div class="hero-overlay"></div>
         <div class="hero-container">
-            <div>
+            <div class="hero-left-content">
                 <div class="hero-tag">
                     <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                     <span>Official CFX.re Escrow Certified</span>
@@ -1796,15 +1816,15 @@ const storefrontHTML = `<!DOCTYPE html>
                 </div>
             </div>
 
-            <!-- Real-Time Live Feed Card -->
-            <div>
+            <!-- Real-Time Live Feed Card Placed on Far Right -->
+            <div class="hero-right-widget">
                 <div class="recent-payments-card">
                     <div class="payments-header">
                         <div class="payments-header-title">
                             <span class="live-dot"></span>
                             <span>LIVE PAYMENTS FEED</span>
                         </div>
-                        <span style="font-size: 0.72rem; color: var(--brand-light); font-weight: 700;">MIRAGESTORE.TEBEX.IO</span>
+                        <span style="font-size: 0.65rem; color: var(--brand-light); font-weight: 700;">MIRAGESTORE.TEBEX.IO</span>
                     </div>
 
                     <div class="payments-list" id="recentPaymentsList"></div>
