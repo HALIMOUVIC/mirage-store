@@ -2925,6 +2925,10 @@ app.get('/api/sync-tebex', async (req, res) => {
 });
 
 // Cryptographic Tebex Official Webhook Listener (HMAC-SHA256)
+app.get('/api/webhooks/tebex', (req, res) => {
+    res.json({ status: 'active', service: 'Mirage Store Tebex Webhook Listener' });
+});
+
 app.post('/api/webhooks/tebex', async (req, res) => {
     const signature = req.headers['x-tebex-signature'];
     
@@ -2943,6 +2947,11 @@ app.post('/api/webhooks/tebex', async (req, res) => {
 
     const event = req.body;
     console.log('[Webhook Received]:', event?.type || 'payment.completed');
+
+    // Handle Tebex endpoint verification/validation ping
+    if (event?.type === 'validation' || !event || Object.keys(event).length === 0) {
+        return res.json({ success: true, message: 'Webhook endpoint verified successfully' });
+    }
 
     if (event && (event.type === 'payment.completed' || event.subject)) {
         const buyerName = event.subject?.customer?.username || event.player?.name || 'Verified Customer';
