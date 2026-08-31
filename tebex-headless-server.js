@@ -3310,27 +3310,29 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '        .lightbox-prev { left: 24px; }' +
 '        .lightbox-next { right: 24px; }' +
 '        .lightbox-counter { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(12, 18, 34, 0.85); border: 1px solid rgba(255,255,255,0.15); padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: 800; color: #fff; }' +
-'        /* Right column info card */' +
-'        .info-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.15rem; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35); }' +
-'        .top-tags { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }' +
-'        .badge-pill { padding: 0.25rem 0.65rem; border-radius: 6px; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; }' +
+'        /* Modern Compact Info Card */' +
+'        .info-box { background: rgba(18, 28, 49, 0.94); border: 1px solid rgba(148, 163, 184, 0.16); border-radius: 14px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.85rem; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35); }' +
+'        .top-tags { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }' +
+'        .badge-pill { padding: 0.2rem 0.55rem; border-radius: 6px; font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; }' +
 '        .badge-pill.accent { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }' +
 '        .badge-pill.brand { background: rgba(2, 132, 199, 0.15); color: #38bdf8; border: 1px solid rgba(2, 132, 199, 0.4); }' +
 '        .badge-pill.purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }' +
 '        .badge-pill.orange { background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.4); }' +
-'        .escrow-pill { display: flex; align-items: center; gap: 0.35rem; background: rgba(34, 197, 94, 0.14); border: 1px solid rgba(34, 197, 94, 0.35); color: #4ade80; font-size: 0.68rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 6px; }' +
-'        .product-title { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.02em; color: #ffffff; line-height: 1.25; }' +
-'        .meta-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }' +
-'        .chip { background: var(--card-inner); border: 1px solid var(--card-border); padding: 0.3rem 0.65rem; border-radius: 8px; font-size: 0.74rem; font-weight: 700; color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem; }' +
-'        .chip span { color: #ffffff; }' +
-'        .price-box { background: var(--card-inner); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 12px; padding: 0.9rem 1.15rem; display: flex; justify-content: space-between; align-items: center; }' +
-'        .price-val { font-size: 1.4rem; font-weight: 800; color: #ffffff; }' +
-'        .price-period { font-size: 0.75rem; color: var(--text-muted); margin-left: 0.25rem; }' +
-'        .btn-buy-lg { width: 100%; background: linear-gradient(135deg, var(--brand), var(--brand-hover)); color: #ffffff; border: none; padding: 0.85rem 1.5rem; border-radius: 12px; font-size: 0.88rem; font-weight: 800; letter-spacing: 0.02em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.6rem; box-shadow: 0 6px 20px var(--brand-glow); transition: all 0.2s; }' +
-'        .btn-buy-lg:hover { background: linear-gradient(135deg, var(--brand-light), var(--brand)); box-shadow: 0 8px 24px rgba(56, 189, 248, 0.45); transform: translateY(-1px); }' +
+'        .escrow-pill { display: flex; align-items: center; gap: 0.3rem; background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.3); color: #4ade80; font-size: 0.62rem; font-weight: 800; padding: 0.2rem 0.55rem; border-radius: 6px; }' +
+'        .product-title { font-size: 1.18rem; font-weight: 800; letter-spacing: -0.015em; color: #ffffff; line-height: 1.25; }' +
+'        .meta-chips { display: flex; gap: 0.45rem; flex-wrap: wrap; }' +
+'        .chip { background: rgba(10, 16, 30, 0.85); border: 1px solid rgba(148, 163, 184, 0.14); padding: 0.22rem 0.55rem; border-radius: 6px; font-size: 0.68rem; font-weight: 700; color: #94a3b8; display: flex; align-items: center; gap: 0.3rem; }' +
+'        .chip span { color: #f1f5f9; }' +
+'        .product-short-desc { color: #94a3b8; font-size: 0.76rem; line-height: 1.45; }' +
+'        .price-box { background: rgba(10, 16, 30, 0.85); border: 1px solid rgba(56, 189, 248, 0.22); border-radius: 10px; padding: 0.7rem 0.95rem; display: flex; justify-content: space-between; align-items: center; }' +
+'        .price-val { font-size: 1.18rem; font-weight: 800; color: #ffffff; }' +
+'        .price-period { font-size: 0.68rem; color: #94a3b8; margin-left: 0.2rem; }' +
+'        .price-stock { font-size: 0.68rem; color: #4ade80; font-weight: 700; display: flex; align-items: center; gap: 0.25rem; }' +
+'        .btn-buy-lg { width: 100%; background: linear-gradient(135deg, var(--brand), var(--brand-hover)); color: #ffffff; border: none; padding: 0.7rem 1.25rem; border-radius: 10px; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.02em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 4px 16px var(--brand-glow); transition: all 0.2s; }' +
+'        .btn-buy-lg:hover { background: linear-gradient(135deg, var(--brand-light), var(--brand)); box-shadow: 0 6px 20px rgba(56, 189, 248, 0.45); transform: translateY(-1px); }' +
 '        .btn-buy-lg:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }' +
-'        .trust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; padding-top: 0.4rem; border-top: 1px solid var(--card-border); }' +
-'        .trust-item { display: flex; align-items: center; gap: 0.45rem; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }' +
+'        .trust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; padding-top: 0.55rem; border-top: 1px solid rgba(148, 163, 184, 0.12); }' +
+'        .trust-item { display: flex; align-items: center; gap: 0.35rem; font-size: 0.68rem; font-weight: 700; color: #94a3b8; }' +
 '        .trust-item svg { color: var(--brand-light); flex-shrink: 0; }' +
 '        .desc-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; overflow: hidden; margin-bottom: 2.5rem; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35); }' +
 '        .desc-card-header { background: rgba(13, 21, 38, 0.9); padding: 0.85rem 1.35rem; border-bottom: 1px solid var(--card-border); display: flex; align-items: center; justify-content: space-between; }' +
@@ -3468,31 +3470,31 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '                <h1 class="product-title">' + p.name + '</h1>' +
 '                <div class="meta-chips">' +
 '                    <div class="chip">' +
-'                        <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/></svg>' +
+'                        <svg width="11" height="11" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/></svg>' +
 '                        <span>' + p.resmon + ' Resmon</span>' +
 '                    </div>' +
 '                    <div class="chip">' +
-'                        <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd"/></svg>' +
+'                        <svg width="11" height="11" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd"/></svg>' +
 '                        <span>' + p.framework + '</span>' +
 '                    </div>' +
 '                </div>' +
-'                <p style="color: var(--text-muted); font-size: 0.84rem; line-height: 1.5;">' + p.shortDesc + '</p>' +
+'                <p class="product-short-desc">' + p.shortDesc + '</p>' +
 '                <div class="price-box">' +
 '                    <div>' +
 '                        <span class="price-val">$' + priceFormatted + '</span>' +
 '                        <span class="price-period">' + (isSub ? '/ month' : 'one-time') + '</span>' +
 '                    </div>' +
-'                    <div style="font-size: 0.72rem; color: #4ade80; font-weight: 700;">✓ In Stock & Instant Keymaster</div>' +
+'                    <div class="price-stock">✓ In Stock & Instant Keymaster</div>' +
 '                </div>' +
 '                <button class="btn-buy-lg" id="buyBtn" onclick="initiateBuy(' + p.id + ')">' +
-'                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd"/></svg>' +
+'                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd"/></svg>' +
 '                    <span id="buyBtnText">Buy with CFX.re Keymaster</span>' +
 '                </button>' +
 '                <div class="trust-grid">' +
-'                    <div class="trust-item"><svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span>CFX Escrow Safe</span></div>' +
-'                    <div class="trust-item"><svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/></svg><span>Instant Delivery</span></div>' +
-'                    <div class="trust-item"><svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg><span>Full Support</span></div>' +
-'                    <div class="trust-item"><svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"/></svg><span>24/7 Discord Help</span></div>' +
+'                    <div class="trust-item"><svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span>CFX Escrow Safe</span></div>' +
+'                    <div class="trust-item"><svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/></svg><span>Instant Delivery</span></div>' +
+'                    <div class="trust-item"><svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg><span>Full Support</span></div>' +
+'                    <div class="trust-item"><svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"/></svg><span>24/7 Discord Help</span></div>' +
 '                </div>' +
 '            </div>' +
 '        </div>' +
