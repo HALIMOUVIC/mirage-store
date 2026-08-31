@@ -2055,11 +2055,28 @@ const storefrontHTML = `<!DOCTYPE html>
                         </div>
 
                         <div class="card-actions">
-                            <button class="btn-view" onclick="openModal(\${p.id})">Details & Gallery</button>
-                            <button class="btn-buy-card" onclick="initiateBuy(\${p.id})">Buy Now</button>
+                            <button class="btn-view" data-product-id="${p.id}">Details & Gallery</button>
+                            <button class="btn-buy-card" data-product-id="${p.id}">Buy Now</button>
                         </div>
                     </div>
-                \`;
+                `;
+
+                const btnView = card.querySelector('.btn-view');
+                if (btnView) {
+                    btnView.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        openModal(p.id);
+                    });
+                }
+
+                const btnBuy = card.querySelector('.btn-buy-card');
+                if (btnBuy) {
+                    btnBuy.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        initiateBuy(p.id);
+                    });
+                }
+
                 grid.appendChild(card);
             });
         }
@@ -2253,6 +2270,40 @@ const storefrontHTML = `<!DOCTYPE html>
             loadStore();
             initRealtimeFeed();
 
+            // Bind modal buy button
+            const modalBuyBtn = document.getElementById('modalBuyBtn');
+            if (modalBuyBtn) {
+                modalBuyBtn.addEventListener('click', handleModalBuy);
+            }
+
+            // Bind modal close button
+            const modalCloseBtn = document.querySelector('.btn-close-modal');
+            if (modalCloseBtn) {
+                modalCloseBtn.addEventListener('click', closeModal);
+            }
+
+            // Bind modal tab buttons
+            document.querySelectorAll('.modal-tab-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const tabName = btn.getAttribute('data-tab') || (btn.innerText.toLowerCase().includes('video') ? 'video' : (btn.innerText.toLowerCase().includes('docs') ? 'docs' : 'overview'));
+                    switchModalTab(tabName, e);
+                });
+            });
+
+            // Bind category filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const cat = btn.getAttribute('data-cat') || btn.innerText.toLowerCase();
+                    let targetCategory = 'all';
+                    if (cat.includes('script')) targetCategory = 'scripts';
+                    else if (cat.includes('mlo')) targetCategory = 'mlos';
+                    else if (cat.includes('vehicle') || cat.includes('car')) targetCategory = 'vehicles';
+                    else if (cat.includes('cad') || cat.includes('mdt')) targetCategory = 'cads';
+                    filterCategory(targetCategory, e);
+                });
+            });
+
+            // Handle URL auth return
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('basketId')) {
                 initiateBuy(NOTARY_PACKAGE_ID);
