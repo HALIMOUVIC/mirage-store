@@ -559,31 +559,153 @@ const storefrontHTML = `<!DOCTYPE html>
             gap: 0.85rem;
         }
 
-        /* Top Supporter Badge */
-        .top-supporter-nav {
+        /* CFX.re User Authentication & Profile Dropdown */
+        .cfx-user-container {
+            position: relative;
+        }
+
+        .cfx-login-btn {
+            background: linear-gradient(135deg, rgba(2, 132, 199, 0.25), rgba(56, 189, 248, 0.15));
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            color: #ffffff;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 0.55rem 1.1rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .cfx-login-btn:hover {
+            background: var(--brand);
+            box-shadow: 0 0 16px var(--brand-glow);
+            transform: translateY(-1px);
+        }
+
+        .cfx-mini-logo {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            object-fit: contain;
+        }
+
+        .cfx-profile-dropdown {
+            position: relative;
+        }
+
+        .cfx-user-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            background: rgba(13, 20, 36, 0.9);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            padding: 0.4rem 0.85rem;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .cfx-profile-dropdown:hover .cfx-user-pill {
+            border-color: var(--brand-light);
+            background: rgba(2, 132, 199, 0.2);
+        }
+
+        .cfx-user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--brand-light);
+            box-shadow: 0 0 8px var(--brand-glow);
+        }
+
+        .cfx-user-meta {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .cfx-username {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+
+        .cfx-badge {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--brand-light);
+            letter-spacing: 0.02em;
+        }
+
+        .cfx-chevron {
+            color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+
+        .cfx-profile-dropdown:hover .cfx-chevron {
+            transform: rotate(180deg);
+        }
+
+        .cfx-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 210px;
+            background: rgba(7, 11, 20, 0.96);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 0.5rem;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(20px);
+            display: none;
+            flex-direction: column;
+            gap: 0.35rem;
+            z-index: 100;
+        }
+
+        .cfx-profile-dropdown:hover .cfx-dropdown-menu {
+            display: flex;
+        }
+
+        .cfx-menu-item {
             display: flex;
             align-items: center;
             gap: 0.6rem;
-            background: rgba(2, 132, 199, 0.12);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            padding: 0.45rem 0.85rem;
-            border-radius: 12px;
-            font-size: 0.78rem;
+            padding: 0.6rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-decoration: none;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            text-align: left;
+            width: 100%;
+            transition: all 0.2s;
         }
 
-        @media (max-width: 768px) { .top-supporter-nav { display: none; } }
+        .cfx-menu-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--brand-light);
+        }
 
-        .supporter-avatar {
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            background: #0284c7;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 900;
-            color: #fff;
+        .cfx-logout-btn {
+            color: #f87171 !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            margin-top: 0.25rem;
+            padding-top: 0.65rem;
+        }
+
+        .cfx-logout-btn:hover {
+            background: rgba(239, 68, 68, 0.15) !important;
+            color: #fca5a5 !important;
         }
 
         .discord-btn {
@@ -603,26 +725,6 @@ const storefrontHTML = `<!DOCTYPE html>
         .discord-btn:hover {
             background: #4752c4;
             transform: translateY(-1px);
-        }
-
-        .admin-btn {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--card-border);
-            color: #cbd5e1;
-            font-size: 0.82rem;
-            font-weight: 700;
-            text-decoration: none;
-            padding: 0.55rem 0.9rem;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-            transition: all 0.2s;
-        }
-
-        .admin-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
-            color: #ffffff;
         }
 
         /* 4K Real GTA Hero Banner Section */
@@ -1572,12 +1674,6 @@ const storefrontHTML = `<!DOCTYPE html>
 </head>
 <body>
 
-    <!-- Announcement Ticker -->
-    <div id="announcementBanner" class="announcement-bar">
-        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/></svg>
-        <span>⚡ FLASH SALE: USE CODE "MIRAGE20" FOR 20% OFF • 100% CFX.RE ESCROW & INSTANT KEYMASTER DELIVERY</span>
-    </div>
-
     <!-- Header Navigation with Mirage Shield Logo -->
     <header class="navbar">
         <div class="nav-container">
@@ -1595,18 +1691,32 @@ const storefrontHTML = `<!DOCTYPE html>
             </ul>
 
             <div class="nav-actions">
-                <div class="top-supporter-nav" id="topSupporterBadge">
-                    <div class="supporter-avatar">👑</div>
-                    <div>
-                        <div style="font-weight: 800; color: #ffffff;" id="topSupporterName">URSU ARTS</div>
-                        <div style="font-size: 0.7rem; color: var(--text-muted);" id="topSupporterTitle">Paid the most this month</div>
+                <!-- CFX.re User Profile / Authentication -->
+                <div id="cfxUserContainer" class="cfx-user-container">
+                    <button id="cfxLoginBtn" class="cfx-login-btn" onclick="loginWithCfx()">
+                        <img src="https://forum.cfx.re/uploads/default/original/4X/3/0/0/30064d12c8ff4978be77bb326e57973eeaa89bf0.png" alt="CFX" class="cfx-mini-logo" onerror="this.src='/public/images/logo.png'" />
+                        <span>Sign In with Cfx.re</span>
+                    </button>
+
+                    <div id="cfxProfileDropdown" class="cfx-profile-dropdown" style="display: none;">
+                        <div class="cfx-user-pill">
+                            <img id="cfxUserAvatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100" alt="CFX Avatar" class="cfx-user-avatar" />
+                            <div class="cfx-user-meta">
+                                <span id="cfxUserName" class="cfx-username">FiveM User</span>
+                                <span class="cfx-badge">Keymaster Active</span>
+                            </div>
+                            <svg class="cfx-chevron" width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                        </div>
+                        <div class="cfx-dropdown-menu">
+                            <a href="https://keymaster.fivem.net" target="_blank" class="cfx-menu-item">
+                                <span>🔑 My Keymaster Assets</span>
+                            </a>
+                            <button class="cfx-menu-item cfx-logout-btn" onclick="logoutCfx()">
+                                <span>🚪 Log Out</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
-
-                <a href="/admin" class="admin-btn">
-                    <svg width="15" height="15" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
-                    <span>Admin</span>
-                </a>
 
                 <a id="discordLink" href="https://discord.gg/fivem" target="_blank" class="discord-btn">
                     <svg width="17" height="17" fill="currentColor" viewBox="0 0 24 24">
@@ -1907,27 +2017,101 @@ const storefrontHTML = `<!DOCTYPE html>
             }
         }
 
+        // CFX.re User Session Management
+        async function initCfxUser() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const basketId = urlParams.get('basketId') || sessionStorage.getItem('tebex_basket_id');
+                
+                let savedUser = null;
+                try {
+                    savedUser = JSON.parse(localStorage.getItem('cfx_user'));
+                } catch (e) {}
+
+                if (basketId) {
+                    const res = await fetch('/api/user/profile?basketId=' + encodeURIComponent(basketId));
+                    const data = await res.json();
+                    if (data && data.loggedIn) {
+                        savedUser = data;
+                        localStorage.setItem('cfx_user', JSON.stringify(data));
+                    }
+                }
+
+                renderCfxUser(savedUser);
+            } catch (err) {
+                console.warn('CFX User Init Error:', err);
+            }
+        }
+
+        function renderCfxUser(user) {
+            const loginBtn = document.getElementById('cfxLoginBtn');
+            const profileDropdown = document.getElementById('cfxProfileDropdown');
+            const userAvatar = document.getElementById('cfxUserAvatar');
+            const userName = document.getElementById('cfxUserName');
+
+            if (user && user.loggedIn) {
+                if (loginBtn) loginBtn.style.display = 'none';
+                if (profileDropdown) profileDropdown.style.display = 'block';
+                if (userName) userName.innerText = user.username;
+                if (userAvatar) {
+                    userAvatar.src = user.avatar || ('https://forum.cfx.re/user_avatar/forum.cfx.re/' + encodeURIComponent(user.username) + '/120/1.png');
+                    userAvatar.onerror = function() {
+                        this.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100';
+                    };
+                }
+            } else {
+                if (loginBtn) loginBtn.style.display = 'flex';
+                if (profileDropdown) profileDropdown.style.display = 'none';
+            }
+        }
+
+        async function loginWithCfx() {
+            const btn = document.getElementById('cfxLoginBtn');
+            if (btn) btn.innerHTML = '<span>Connecting to Cfx.re...</span>';
+            try {
+                const res = await fetch('/api/create-checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ packageId: NOTARY_PACKAGE_ID, returnBaseUrl: window.location.origin })
+                });
+                const data = await res.json();
+                if (data && data.authUrl) {
+                    window.location.href = data.authUrl;
+                } else if (data && data.checkoutUrl) {
+                    window.location.href = data.checkoutUrl;
+                }
+            } catch (e) {
+                alert('Failed to connect to CFX login');
+                if (btn) btn.innerHTML = '<img src="https://forum.cfx.re/uploads/default/original/4X/3/0/0/30064d12c8ff4978be77bb326e57973eeaa89bf0.png" class="cfx-mini-logo" /> <span>Sign In with Cfx.re</span>';
+            }
+        }
+
+        function logoutCfx() {
+            localStorage.removeItem('cfx_user');
+            sessionStorage.removeItem('tebex_basket_id');
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.pathname);
+            }
+            renderCfxUser(null);
+            window.location.reload();
+        }
+
         async function loadStore() {
             try {
                 const res = await fetch('/api/store');
                 const data = await res.json();
                 storeProducts = data.products || [];
                 
-                if (data.announcement) {
-                    document.getElementById('announcementBanner').querySelector('span').innerText = data.announcement;
-                }
                 if (data.discordUrl) {
-                    document.getElementById('discordLink').href = data.discordUrl;
-                }
-                if (data.topSupporter) {
-                    document.getElementById('topSupporterName').innerText = data.topSupporter.name;
-                    document.getElementById('topSupporterTitle').innerText = data.topSupporter.title;
+                    const dLink = document.getElementById('discordLink');
+                    if (dLink) dLink.href = data.discordUrl;
                 }
 
                 renderRecentPayments(data.recentPayments || []);
                 renderProducts(storeProducts);
                 renderReviews(data.reviews || []);
                 populateReviewSelect(storeProducts);
+                initCfxUser();
             } catch (e) {
                 console.error('Failed to load store data:', e);
             }
@@ -3218,6 +3402,32 @@ app.post('/api/create-checkout', async (req, res) => {
     } catch (error) {
         console.error('[API] Server Error:', error);
         res.status(500).json({ error: 'Internal Server Error: ' + error.message });
+    }
+});
+
+// Authenticated CFX / FiveM User Profile Endpoint
+app.get('/api/user/profile', async (req, res) => {
+    try {
+        const { basketId } = req.query;
+        if (!basketId) return res.json({ loggedIn: false });
+
+        const basketRes = await fetch(`https://headless.tebex.io/api/accounts/${TEBEX_PUBLIC_TOKEN}/baskets/${basketId}`);
+        const data = await basketRes.json().catch(() => null);
+
+        if (data && data.data) {
+            const username = data.data.username || data.data.customer?.username || data.data.creator_code?.name;
+            if (username) {
+                return res.json({
+                    loggedIn: true,
+                    username: username,
+                    avatar: `https://forum.cfx.re/user_avatar/forum.cfx.re/${encodeURIComponent(username)}/120/1.png`,
+                    basketId: basketId
+                });
+            }
+        }
+        res.json({ loggedIn: false });
+    } catch (e) {
+        res.json({ loggedIn: false });
     }
 });
 
