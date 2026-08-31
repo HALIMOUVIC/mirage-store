@@ -2055,11 +2055,11 @@ const storefrontHTML = `<!DOCTYPE html>
                         </div>
 
                         <div class="card-actions">
-                            <button class="btn-view" data-product-id="${p.id}">Details & Gallery</button>
-                            <button class="btn-buy-card" data-product-id="${p.id}">Buy Now</button>
+                            <button class="btn-view" data-product-id="\${p.id}">Details & Gallery</button>
+                            <button class="btn-buy-card" data-product-id="\${p.id}">Buy Now</button>
                         </div>
                     </div>
-                `;
+                \`;
 
                 const btnView = card.querySelector('.btn-view');
                 if (btnView) {
@@ -2112,7 +2112,7 @@ const storefrontHTML = `<!DOCTYPE html>
                 p.media.forEach((imgUrl, idx) => {
                     const thumb = document.createElement('div');
                     thumb.className = 'thumb-item' + (idx === 0 ? ' active' : '');
-                    thumb.innerHTML = `<img src="${imgUrl}" alt="Thumb" />`;
+                    thumb.innerHTML = \`<img src="\${imgUrl}" alt="Thumb" />\`;
                     thumb.onclick = () => {
                         document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
                         thumb.classList.add('active');
@@ -2152,9 +2152,9 @@ const storefrontHTML = `<!DOCTYPE html>
             const viewer = document.getElementById('mediaViewer');
             if (type === 'video') {
                 const embedUrl = getYouTubeEmbed(url);
-                viewer.innerHTML = `<iframe width="100%" height="100%" src="${embedUrl}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+                viewer.innerHTML = \`<iframe width="100%" height="100%" src="\${embedUrl}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>\`;
             } else {
-                viewer.innerHTML = `<img id="mainMediaImg" src="${url}" alt="Showcase" />`;
+                viewer.innerHTML = \`<img id="mainMediaImg" src="\${url}" alt="Showcase" />\`;
             }
         }
 
