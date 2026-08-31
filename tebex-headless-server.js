@@ -56,33 +56,10 @@ app.use(compression());
 app.use(cors());
 app.use(cookieParser());
 
-// Helmet Content Security Policy
+// Helmet Enterprise Security Headers
 app.use(
     helmet({
-        contentSecurityPolicy: {
-            directives: {
-                defaultSrc: ["'self'"],
-                scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://js.tebex.io"],
-                scriptSrcAttr: ["'unsafe-inline'"],
-                styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-                styleSrcAttr: ["'unsafe-inline'"],
-                fontSrc: ["'self'", "https://fonts.gstatic.com"],
-                imgSrc: ["'self'", "data:", "https:", "blob:"],
-                frameSrc: [
-                    "'self'",
-                    "https://checkout.tebex.io",
-                    "https://www.youtube.com",
-                    "https://www.youtube-nocookie.com"
-                ],
-                connectSrc: [
-                    "'self'",
-                    "https://headless.tebex.io",
-                    "https://checkout.tebex.io",
-                    "https://plugin.tebex.io",
-                    "https://js.tebex.io"
-                ]
-            }
-        },
+        contentSecurityPolicy: false,
         crossOriginEmbedderPolicy: false
     })
 );
