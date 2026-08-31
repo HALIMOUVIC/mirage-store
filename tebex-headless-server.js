@@ -75,6 +75,11 @@ app.use(express.json({
 app.use('/public', express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
 app.use(express.static(__dirname, { maxAge: '1d' }));
 
+// Favicon Endpoint
+app.get('/favicon.ico', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'images', 'logo.png'));
+});
+
 // ===================================================
 // 4. Rate Limiting Architecture
 // ===================================================
@@ -2152,7 +2157,7 @@ const storefrontHTML = `<!DOCTYPE html>
             const viewer = document.getElementById('mediaViewer');
             if (type === 'video') {
                 const embedUrl = getYouTubeEmbed(url);
-                viewer.innerHTML = \`<iframe width="100%" height="100%" src="\${embedUrl}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>\`;
+                viewer.innerHTML = \`<iframe width="100%" height="100%" src="\${embedUrl}" title="Product Video Showcase" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>\`;
             } else {
                 viewer.innerHTML = \`<img id="mainMediaImg" src="\${url}" alt="Showcase" />\`;
             }
@@ -2161,16 +2166,16 @@ const storefrontHTML = `<!DOCTYPE html>
         function getYouTubeEmbed(url) {
             if (!url) return '';
             try {
+                let id = '';
                 if (url.indexOf('youtu.be/') !== -1) {
-                    const id = url.split('youtu.be/')[1].split('?')[0].split('&')[0];
-                    return 'https://www.youtube-nocookie.com/embed/' + id;
+                    id = url.split('youtu.be/')[1].split('?')[0].split('&')[0];
+                } else if (url.indexOf('watch?v=') !== -1) {
+                    id = url.split('watch?v=')[1].split('&')[0];
+                } else if (url.indexOf('/embed/') !== -1) {
+                    id = url.split('/embed/')[1].split('?')[0].split('&')[0];
                 }
-                if (url.indexOf('watch?v=') !== -1) {
-                    const id = url.split('watch?v=')[1].split('&')[0];
-                    return 'https://www.youtube-nocookie.com/embed/' + id;
-                }
-                if (url.indexOf('/embed/') !== -1) {
-                    return url;
+                if (id) {
+                    return 'https://www.youtube.com/embed/' + id + '?enablejsapi=1&rel=0';
                 }
                 return url;
             } catch (e) {
