@@ -4133,7 +4133,7 @@ app.post('/api/create-checkout', async (req, res) => {
             console.log(`[API] New Basket Created: ${basketIdent}`);
         }
 
-        const packageReq = await fetch(`https://headless.tebex.io/api/baskets/${basketIdent}/packages`, {
+        let packageReq = await fetch(`https://headless.tebex.io/api/baskets/${basketIdent}/packages`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -4142,7 +4142,33 @@ app.post('/api/create-checkout', async (req, res) => {
             })
         });
 
-        const packageData = await packageReq.json().catch(() => null);
+        let packageData = await packageReq.json().catch(() => null);
+
+        // If the basket expired or was invalid, auto-recover by creating a fresh basket
+        if (packageReq.status === 404 || packageData?.title?.toLowerCase().includes('not found') || packageData?.detail?.toLowerCase().includes('not found')) {
+            console.log(`[API] Basket ${basketIdent} expired or not found. Re-creating fresh basket...`);
+            const retryBasketReq = await fetch(`https://headless.tebex.io/api/accounts/${TEBEX_PUBLIC_TOKEN}/baskets`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    complete_url: `${liveOrigin}${exactPath}`,
+                    cancel_url: `${liveOrigin}${exactPath}`
+                })
+            });
+            const retryBasketData = await retryBasketReq.json().catch(() => null);
+            if (retryBasketData?.data?.ident) {
+                basketIdent = retryBasketData.data.ident;
+                packageReq = await fetch(`https://headless.tebex.io/api/baskets/${basketIdent}/packages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        package_id: targetPackageId,
+                        quantity: 1
+                    })
+                });
+                packageData = await packageReq.json().catch(() => null);
+            }
+        }
 
         if (packageReq.status === 422 && (packageData?.detail?.toLowerCase().includes('login') || packageData?.title?.toLowerCase().includes('payload') || packageData?.detail?.toLowerCase().includes('auth'))) {
             console.log(`[API] User login required for FiveM package. Fetching auth links for ${liveOrigin}${exactPath}...`);
@@ -4161,7 +4187,13 @@ app.post('/api/create-checkout', async (req, res) => {
             }
         }
 
-        if (!packageReq.ok) {
+        if (!packageReq.ok && !(packageData?.detail?.toLowerCase().includes('already') || packageData?.detail?.toLowerCase().includes('again'))) {
+            if (packageData?.detail?.toLowerCase().includes('invalid')) {
+                return res.json({
+                    isUnpublished: true,
+                    message: 'This showcase package is not yet published to your live Tebex store.'
+                });
+            }
             console.error('Tebex Package Error:', packageData);
             return res.status(400).json({ 
                 error: packageData?.detail || packageData?.title || 'Failed to add item to basket',
