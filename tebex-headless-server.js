@@ -779,8 +779,8 @@ const storefrontHTML = `<!DOCTYPE html>
             padding: 4rem 1.5rem;
             width: 100%;
             display: grid;
-            grid-template-columns: 1.25fr 0.75fr;
-            gap: 3.5rem;
+            grid-template-columns: 1.45fr 0.7fr;
+            gap: 2.5rem;
             align-items: center;
         }
 
@@ -880,42 +880,45 @@ const storefrontHTML = `<!DOCTYPE html>
             transform: translateY(-2px);
         }
 
-        /* Real Recent Payments Widget with Real-time Animation */
+        /* Real Recent Payments Widget with Sleek Compact Design Positioned to the Right */
         .recent-payments-card {
-            background: rgba(13, 20, 36, 0.85);
-            border: 1px solid rgba(56, 189, 248, 0.25);
-            border-radius: 20px;
-            padding: 1.5rem;
+            background: rgba(10, 16, 30, 0.88);
+            border: 1px solid rgba(56, 189, 248, 0.22);
+            border-radius: 14px;
+            padding: 0.9rem 1.1rem;
             backdrop-filter: blur(20px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 30px -10px var(--brand-glow);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 24px -8px var(--brand-glow);
+            width: 100%;
+            max-width: 320px;
+            margin-left: auto;
         }
 
         .payments-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--card-border);
-            margin-bottom: 1rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 0.65rem;
         }
 
         .payments-header-title {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.85rem;
+            gap: 0.35rem;
+            font-size: 0.68rem;
             font-weight: 800;
             color: #ffffff;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.04em;
         }
 
         .live-dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             background: #22c55e;
-            box-shadow: 0 0 10px #22c55e;
+            box-shadow: 0 0 8px #22c55e;
             animation: pulse 2s infinite;
         }
 
@@ -928,18 +931,18 @@ const storefrontHTML = `<!DOCTYPE html>
         .payments-list {
             display: flex;
             flex-direction: column;
-            gap: 0.65rem;
+            gap: 0.45rem;
         }
 
         .payment-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(30, 41, 59, 0.4);
-            border: 1px solid var(--card-border);
-            padding: 0.65rem 0.85rem;
-            border-radius: 12px;
-            transition: all 0.3s ease;
+            background: rgba(22, 33, 58, 0.45);
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            padding: 0.4rem 0.6rem;
+            border-radius: 8px;
+            transition: all 0.25s ease;
         }
 
         .payment-row.new-entry {
@@ -948,66 +951,71 @@ const storefrontHTML = `<!DOCTYPE html>
 
         @keyframes highlightEntry {
             from { background: rgba(56, 189, 248, 0.35); border-color: var(--brand-light); }
-            to { background: rgba(30, 41, 59, 0.4); }
+            to { background: rgba(22, 33, 58, 0.45); }
         }
 
         .payment-row:hover {
-            transform: translateX(4px);
-            border-color: rgba(56, 189, 248, 0.3);
+            transform: translateX(3px);
+            border-color: rgba(56, 189, 248, 0.35);
+            background: rgba(22, 33, 58, 0.75);
         }
 
         .payment-user {
             display: flex;
             align-items: center;
-            gap: 0.65rem;
+            gap: 0.45rem;
         }
 
         .payment-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
             object-fit: cover;
         }
 
         .payment-info .name {
-            font-size: 0.82rem;
+            font-size: 0.7rem;
             font-weight: 800;
             color: #ffffff;
+            line-height: 1.1;
         }
 
         .payment-info .item {
-            font-size: 0.72rem;
+            font-size: 0.62rem;
             color: var(--text-muted);
+            line-height: 1.1;
         }
 
         .payment-price {
             text-align: right;
-            font-size: 0.82rem;
+            font-size: 0.7rem;
             font-weight: 800;
             color: var(--brand-light);
+            line-height: 1.1;
         }
 
         .payment-time {
-            font-size: 0.68rem;
+            font-size: 0.58rem;
             color: var(--text-dim);
+            line-height: 1.1;
         }
 
-        /* Stats Bar */
+        /* Modern Compact Stats Bar with Standard Small Text */
         .stats-bar {
-            max-width: 1280px;
-            margin: -2.5rem auto 5rem auto;
+            max-width: 1040px;
+            margin: -2.2rem auto 4.5rem auto;
             position: relative;
             z-index: 20;
-            padding: 1.75rem 2.5rem;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 24px;
+            padding: 1.1rem 2rem;
+            background: rgba(13, 20, 36, 0.92);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 16px;
             backdrop-filter: blur(20px);
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 1.5rem;
+            gap: 1.25rem;
             text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 0 20px -8px var(--brand-glow);
         }
 
         @media (max-width: 768px) {
@@ -1016,20 +1024,22 @@ const storefrontHTML = `<!DOCTYPE html>
         }
 
         .stat-item h3 {
-            font-size: 2rem;
-            font-weight: 900;
+            font-size: 1.35rem;
+            font-weight: 800;
             color: #ffffff;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
         }
 
-        .stat-item h3 span { color: var(--brand-light); }
+        .stat-item h3 span { color: var(--brand-light); font-size: 1.15rem; }
 
         .stat-item p {
-            font-size: 0.8rem;
+            font-size: 0.68rem;
             font-weight: 700;
-            color: var(--text-dim);
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-top: 0.25rem;
+            letter-spacing: 0.04em;
+            margin-top: 0.15rem;
         }
 
         /* Products Catalog Section */
