@@ -2557,6 +2557,7 @@ const adminHTML = `<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mirage Store - Enterprise Admin Dashboard</title>
+    <script src="https://js.tebex.io/tebex.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -3182,6 +3183,7 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '    <meta charset="UTF-8">' +
 '    <meta name="viewport" content="width=device-width, initial-scale=1.0">' +
 '    <title>' + p.name + ' - Mirage Store</title>' +
+'    <script src="https://js.tebex.io/tebex.min.js"></script>' +
 '    <link rel="preconnect" href="https://fonts.googleapis.com">' +
 '    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
 '    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">' +
@@ -3258,15 +3260,14 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '        .discord-btn:hover { background: #4752c4; }' +
 '        .page-container { max-width: 1240px; margin: 0 auto; padding: 1.5rem 1.25rem 5rem; }' +
 '        .breadcrumb-bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }' +
-'        .back-btn { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: #ffffff; font-size: 0.78rem; font-weight: 700; padding: 0.45rem 0.9rem; border-radius: 10px; text-decoration: none; transition: all 0.2s; }' +
-'        .back-btn:hover { background: rgba(2, 132, 199, 0.2); border-color: var(--brand-light); color: var(--brand-light); transform: translateX(-2px); }' +
-'        .breadcrumbs { display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; color: var(--text-muted); }' +
-'        .breadcrumbs a { color: var(--text-muted); text-decoration: none; }' +
-'        .breadcrumbs a:hover { color: var(--brand-light); }' +
-'        .breadcrumbs span.current { color: #ffffff; font-weight: 700; }' +
-'        .product-layout { display: grid; grid-template-columns: 1.25fr 1fr; gap: 1.75rem; margin-bottom: 2rem; }' +
-'        @media (max-width: 980px) { .product-layout { grid-template-columns: 1fr; } }' +
-'        /* ==================== PROFESSIONAL PHOTO SLIDER ==================== */' +
+'        .breadcrumb-back { display: flex; align-items: center; gap: 0.4rem; background: var(--card-inner); border: 1px solid var(--card-border); color: var(--text-muted); font-size: 0.78rem; font-weight: 700; padding: 0.4rem 0.85rem; border-radius: 10px; text-decoration: none; transition: all 0.2s; }' +
+'        .breadcrumb-back:hover { color: #ffffff; border-color: var(--brand-light); background: rgba(2, 132, 199, 0.2); }' +
+'        .breadcrumb-trail { font-size: 0.76rem; color: var(--text-dim); }' +
+'        .breadcrumb-trail a { color: var(--text-muted); text-decoration: none; }' +
+'        .breadcrumb-trail a:hover { color: var(--brand-light); }' +
+'        .breadcrumb-trail span { color: var(--brand-light); font-weight: 700; }' +
+'        .product-layout { display: grid; grid-template-columns: 1.35fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }' +
+'        @media (max-width: 960px) { .product-layout { grid-template-columns: 1fr; } }' +
 '        .media-showcase { display: flex; flex-direction: column; gap: 0.75rem; }' +
 '        .slider-viewer-container { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; background: #060a12; border-radius: 14px; border: 1px solid var(--card-border); overflow: hidden; box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5); user-select: none; }' +
 '        .slider-viewer-container:hover .slider-nav-btn { opacity: 1; transform: translateY(-50%) scale(1); }' +
@@ -3340,7 +3341,7 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '        .desc-card-title svg { color: var(--brand-light); }' +
 '        .desc-card-body { padding: 1.5rem; font-size: 0.85rem; color: var(--text-body); line-height: 1.7; max-height: 480px; overflow-y: auto; }' +
 '        .desc-card-body p { margin-bottom: 0.85rem; color: var(--text-body); }' +
-'        .desc-card-body ul, .desc-card-body ol { margin-left: 1.25rem; margin-bottom: 0.85rem; }' +
+'        .desc-card-body ul, .desc-card-body ol { margin-left: 1.5rem; margin-bottom: 0.85rem; }' +
 '        .desc-card-body li { margin-bottom: 0.35rem; color: var(--text-body); }' +
 '        .section-header { margin-bottom: 1.25rem; font-size: 1.15rem; font-weight: 800; color: #ffffff; letter-spacing: -0.01em; }' +
 '        .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem; }' +
@@ -3357,6 +3358,18 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '        .card-price { font-size: 1.05rem; font-weight: 800; color: #fff; }' +
 '        .card-period { font-size: 0.7rem; color: var(--text-muted); }' +
 '        .framework-tag { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.68rem; font-weight: 700; color: var(--text-muted); }' +
+'        /* Embedded In-Page Payment Modal */' +
+'        .checkout-modal { position: fixed; inset: 0; background: rgba(4, 7, 14, 0.88); backdrop-filter: blur(20px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 1rem; }' +
+'        .checkout-modal.active { display: flex; }' +
+'        .checkout-modal-content { width: 100%; max-width: 680px; height: 90vh; max-height: 820px; background: #0d1527; border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px var(--brand-glow); animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); }' +
+'        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.96) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }' +
+'        .checkout-modal-header { background: rgba(13, 21, 38, 0.98); padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; }' +
+'        .checkout-modal-title { display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; font-weight: 800; color: #ffffff; }' +
+'        .checkout-modal-title svg { color: var(--brand-light); }' +
+'        .checkout-close-btn { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #ffffff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.95rem; transition: all 0.2s; }' +
+'        .checkout-close-btn:hover { background: #ef4444; border-color: #ef4444; }' +
+'        .checkout-frame-wrapper { flex-grow: 1; width: 100%; background: #080d1a; position: relative; }' +
+'        .checkout-frame-wrapper iframe { width: 100%; height: 100%; border: none; }' +
 '        .footer { border-top: 1px solid var(--card-border); padding: 3rem 1.25rem 2rem; background: #080d1a; text-align: center; color: var(--text-dim); font-size: 0.78rem; }' +
 '    </style>' +
 '</head>' +
@@ -3523,10 +3536,57 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '        <button class="lightbox-nav-btn lightbox-next" onclick="sliderNext(event)" aria-label="Next image">›</button>' +
 '        <div class="lightbox-counter" id="lightboxCounter">1 / ' + sliderMediaItems.length + '</div>' +
 '    </div>' +
+'    <!-- ================= IN-PAGE EMBEDDED CHECKOUT MODAL ================= -->' +
+'    <div id="checkoutModal" class="checkout-modal" onclick="handleCheckoutBackdropClick(event)">' +
+'        <div class="checkout-modal-content">' +
+'            <div class="checkout-modal-header">' +
+'                <div class="checkout-modal-title">' +
+'                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>' +
+'                    <span>Mirage Store • Secure Checkout</span>' +
+'                </div>' +
+'                <button class="checkout-close-btn" onclick="closeCheckoutModal()" aria-label="Close Checkout">✕</button>' +
+'            </div>' +
+'            <div class="checkout-frame-wrapper">' +
+'                <iframe id="checkoutIframe" src="" frameborder="0" allow="payment"></iframe>' +
+'            </div>' +
+'        </div>' +
+'    </div>' +
 '    <footer class="footer"><p>© 2026 Mirage Store Enterprise. All rights reserved. Not affiliated with Rockstar Games or Take-Two Interactive.</p></footer>' +
 '    <script>' +
 '        var sliderItems = ' + JSON.stringify(sliderMediaItems) + ';' +
 '        var currentSlideIdx = 0;' +
+'        function launchPaymentModal(checkoutUrl, ident) {' +
+'            if (typeof Tebex !== "undefined" && Tebex.checkout) {' +
+'                try {' +
+'                    if (ident) {' +
+'                        Tebex.checkout.init({ ident: ident, theme: "dark" });' +
+'                    }' +
+'                    Tebex.checkout.launch();' +
+'                    return;' +
+'                } catch (e) {' +
+'                    console.warn("Tebex SDK modal fallback to in-page frame:", e);' +
+'                }' +
+'            }' +
+'            var modal = document.getElementById("checkoutModal");' +
+'            var iframe = document.getElementById("checkoutIframe");' +
+'            if (modal && iframe && checkoutUrl) {' +
+'                iframe.src = checkoutUrl;' +
+'                modal.classList.add("active");' +
+'            } else if (checkoutUrl) {' +
+'                window.location.href = checkoutUrl;' +
+'            }' +
+'        }' +
+'        function closeCheckoutModal() {' +
+'            var modal = document.getElementById("checkoutModal");' +
+'            var iframe = document.getElementById("checkoutIframe");' +
+'            if (iframe) iframe.src = "";' +
+'            if (modal) modal.classList.remove("active");' +
+'        }' +
+'        function handleCheckoutBackdropClick(e) {' +
+'            if (e.target && e.target.id === "checkoutModal") {' +
+'                closeCheckoutModal();' +
+'            }' +
+'        }' +
 '        function updateSliderView() {' +
 '            var item = sliderItems[currentSlideIdx];' +
 '            var viewer = document.getElementById("mainViewer");' +
@@ -3597,7 +3657,10 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '        window.addEventListener("keydown", function(e) {' +
 '            if (e.key === "ArrowLeft") sliderPrev();' +
 '            else if (e.key === "ArrowRight") sliderNext();' +
-'            else if (e.key === "Escape") closeLightbox();' +
+'            else if (e.key === "Escape") {' +
+'                closeLightbox();' +
+'                closeCheckoutModal();' +
+'            }' +
 '        });' +
 '        /* Touch swipe detection for mobile */' +
 '        var touchStartX = 0;' +
@@ -3610,7 +3673,7 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '            var btn = document.getElementById("buyBtn");' +
 '            var text = document.getElementById("buyBtnText");' +
 '            if (btn) btn.disabled = true;' +
-'            if (text) text.innerText = "Creating Basket...";' +
+'            if (text) text.innerText = "Connecting...";' +
 '            try {' +
 '                var urlParams = new URLSearchParams(window.location.search);' +
 '                var basketId = urlParams.get("basketId") || sessionStorage.getItem("tebex_basket_id");' +
@@ -3629,12 +3692,13 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '                    sessionStorage.setItem("tebex_basket_id", data.basketIdent);' +
 '                }' +
 '                if (data.requiresAuth && data.authUrl) {' +
-'                    if (text) text.innerText = "Redirecting to CFX.re...";' +
+'                    if (text) text.innerText = "Connecting to CFX.re...";' +
 '                    window.location.href = data.authUrl;' +
 '                    return;' +
 '                }' +
-'                if (data.checkoutUrl) {' +
-'                    window.location.href = data.checkoutUrl;' +
+'                if (data.checkoutUrl || data.basketIdent) {' +
+'                    if (text) text.innerText = "Opening Checkout...";' +
+'                    launchPaymentModal(data.checkoutUrl, data.basketIdent);' +
 '                    return;' +
 '                }' +
 '                if (data.error) {' +
