@@ -1,0 +1,55 @@
+{
+  "adminPin": "mirage2026",
+  "announcement": "⚡ FLASH SALE: USE CODE \"MIRAGE20\" FOR 20% OFF • 100% CFX.RE ESCROW & INSTANT KEYMASTER DELIVERY",
+  "discordUrl": "https://discord.gg/fivem",
+  "packages": {
+    "7642742": {
+      "youtubeUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "framework": "QBCore / Qbox / ESX",
+      "resmon": "0.00ms",
+      "badge": "Bestseller",
+      "badgeColor": "accent",
+      "category": "scripts",
+      "docs": "### Installation Guide:\n1. Download the asset from [keymaster.fivem.net](https://keymaster.fivem.net).\n2. Place `notary_system` in your server resources.\n3. Ensure `Config.Banking` matches your banking script (`qbcore` or `okok`).\n4. Add `ensure notary_system` to your `server.cfg`."
+    },
+    "7642743": {
+      "youtubeUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "framework": "All Frameworks / Standalone",
+      "resmon": "0.01ms",
+      "badge": "Ultra Optimized",
+      "badgeColor": "brand",
+      "category": "mlos",
+      "docs": "### Installation Guide:\n1. Download `onyx_dealership` from Keymaster.\n2. Add `ensure onyx_dealership` into `server.cfg`."
+    },
+    "7642744": {
+      "youtubeUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "framework": "QBCore / Qbox / ESX",
+      "resmon": "0.00ms",
+      "badge": "Featured",
+      "badgeColor": "purple",
+      "category": "scripts",
+      "docs": "### Installation Guide:\n1. Add `police_cad` into server resources.\n2. Configure dispatch coordinates in `config.lua`."
+    },
+    "7642745": {
+      "youtubeUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "framework": "Standalone (Add-on)",
+      "resmon": "0.00ms",
+      "badge": "15 Vehicles",
+      "badgeColor": "orange",
+      "category": "vehicles",
+      "docs": "### Installation Guide:\n1. Drag and drop the vehicle stream folder.\n2. Start in `server.cfg`."
+    }
+  },
+  "customReviews": [
+    {
+      "id": "rev-1788182328959",
+      "author": "Dev_Shadow",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80",
+      "role": "Owner, Dynasty RP",
+      "rating": 5,
+      "date": "Just now",
+      "productName": "Notary System v2.0",
+      "comment": "Incredible work on the tablet UI. Very smooth animations and zero resmon."
+    }
+  ]
+}

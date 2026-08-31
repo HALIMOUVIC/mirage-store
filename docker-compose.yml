@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  mirage-store:
+    build: .
+    container_name: mirage_store_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - ./store-config.json:/app/store-config.json
+    environment:
+      - NODE_ENV=production
