@@ -4007,37 +4007,42 @@ app.post('/api/webhooks/tebex', async (req, res) => {
         return res.status(200).json({ id: event?.id || 'ok', status: 'ok', success: true });
     }
 
-    if (event && (event.type === 'payment.completed' || event.subject)) {
-        const buyerName = event.subject?.customer?.username || event.player?.name || event.subject?.player?.name || event.customer?.username || event.username || 'Verified Customer';
-        const itemName = event.subject?.lines?.[0]?.package_name || event.subject?.products?.[0]?.name || event.package?.name || event.subject?.package_name || 'Notary System';
-        const rawAmount = typeof event.subject?.price?.amount === 'number' ? event.subject.price.amount : (event.price !== undefined ? parseFloat(event.price) : 0.00);
-        const currency = event.subject?.price?.currency || event.currency || 'USD';
-        const priceDisplay = '$' + (isNaN(rawAmount) ? '0.00' : rawAmount.toFixed(2)) + ' ' + currency;
+    try {
+        if (event && (event.type === 'payment.completed' || event.subject || event.player)) {
+            const buyerName = event.subject?.customer?.username || event.player?.name || event.subject?.player?.name || event.customer?.username || event.username || 'Verified Customer';
+            const itemName = event.subject?.lines?.[0]?.package_name || event.subject?.products?.[0]?.name || event.package?.name || event.subject?.package_name || 'Notary System';
+            const rawAmount = typeof event.subject?.price?.amount === 'number' ? event.subject.price.amount : (event.price !== undefined ? parseFloat(event.price) : 0.00);
+            const currency = event.subject?.price?.currency || event.currency || 'USD';
+            const priceDisplay = '$' + (isNaN(rawAmount) ? '0.00' : rawAmount.toFixed(2)) + ' ' + currency;
 
-        const newPayment = {
-            id: 'tbx-' + (event.id || event.subject?.transaction_id || Date.now()),
-            buyer: buyerName,
-            item: itemName,
-            time: 'Just now',
-            price: priceDisplay,
-            avatar: buyerName && buyerName !== 'Verified Customer' ? `https://forum.cfx.re/user_avatar/forum.cfx.re/${encodeURIComponent(buyerName)}/120/1.png` : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'
-        };
+            const newPayment = {
+                id: 'tbx-' + (event.id || event.subject?.transaction_id || Date.now()),
+                buyer: buyerName,
+                item: itemName,
+                time: 'Just now',
+                price: priceDisplay,
+                avatar: buyerName && buyerName !== 'Verified Customer' ? `https://forum.cfx.re/user_avatar/forum.cfx.re/${encodeURIComponent(buyerName)}/120/1.png` : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'
+            };
 
-        inMemoryLivePayments.unshift(newPayment);
-        const config = loadStoreConfig();
-        if (!config.realPayments) config.realPayments = [];
-        config.realPayments.unshift(newPayment);
-        saveStoreConfig(config);
-        cachedStoreData = null;
+            inMemoryLivePayments.unshift(newPayment);
+            const config = loadStoreConfig();
+            if (!config.realPayments) config.realPayments = [];
+            config.realPayments.unshift(newPayment);
+            saveStoreConfig(config);
+            cachedStoreData = null;
 
-        // Broadcast to all active browsers in real-time
-        broadcastEvent('payment_received', newPayment);
+            // Broadcast to all active browsers in real-time
+            broadcastEvent('payment_received', newPayment);
 
-        // Send Discord notification
-        sendDiscordNotification('New FiveM Asset Purchased! 🎉', `**Customer:** \`${buyerName}\`\n**Item:** **${itemName}**\n**Amount:** \`${price}\``, 0x22c55e);
+            // Send Discord notification safely
+            sendDiscordNotification('New FiveM Asset Purchased! 🎉', `**Customer:** \`${buyerName}\`\n**Item:** **${itemName}**\n**Amount:** \`${priceDisplay}\``, 0x22c55e);
+        }
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error('[Webhook Error]:', err);
+        res.status(200).json({ success: true, warning: err.message });
     }
-
-    res.json({ success: true });
 });
 
 // Review Submission
