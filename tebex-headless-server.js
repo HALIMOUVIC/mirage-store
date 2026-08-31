@@ -4004,16 +4004,18 @@ app.post('/api/webhooks/tebex', async (req, res) => {
     }
 
     if (event && (event.type === 'payment.completed' || event.subject)) {
-        const buyerName = event.subject?.customer?.username || event.player?.name || 'Verified Customer';
-        const itemName = event.subject?.lines?.[0]?.package_name || '[Escrow] FiveM Package';
-        const price = (event.subject?.price?.amount || 35.00) + ' ' + (event.subject?.price?.currency || 'USD');
+        const buyerName = event.subject?.customer?.username || event.player?.name || event.subject?.player?.name || event.customer?.username || event.username || 'Verified Customer';
+        const itemName = event.subject?.lines?.[0]?.package_name || event.subject?.products?.[0]?.name || event.package?.name || event.subject?.package_name || 'Notary System';
+        const rawAmount = typeof event.subject?.price?.amount === 'number' ? event.subject.price.amount : (event.price !== undefined ? parseFloat(event.price) : 0.00);
+        const currency = event.subject?.price?.currency || event.currency || 'USD';
+        const priceDisplay = '$' + (isNaN(rawAmount) ? '0.00' : rawAmount.toFixed(2)) + ' ' + currency;
 
         const newPayment = {
-            id: 'tbx-' + Date.now(),
+            id: 'tbx-' + (event.id || event.subject?.transaction_id || Date.now()),
             buyer: buyerName,
             item: itemName,
             time: 'Just now',
-            price: price,
+            price: priceDisplay,
             avatar: buyerName && buyerName !== 'Verified Customer' ? `https://forum.cfx.re/user_avatar/forum.cfx.re/${encodeURIComponent(buyerName)}/120/1.png` : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'
         };
 
