@@ -2276,24 +2276,23 @@ const storefrontHTML = `<!DOCTYPE html>
                         </div>
 
                         <div class="card-actions">
-                            <button class="btn-view" data-product-id="\${p.id}">Details & Gallery</button>
+                            <a href="/package/\${p.id}" class="btn-view">Details & Gallery</a>
                             <button class="btn-buy-card" data-product-id="\${p.id}">Buy Now</button>
                         </div>
                     </div>
                 \`;
 
-                const btnView = card.querySelector('.btn-view');
-                if (btnView) {
-                    btnView.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        openModal(p.id);
-                    });
+                const imgWrap = card.querySelector('.card-img-wrapper');
+                if (imgWrap) {
+                    imgWrap.style.cursor = 'pointer';
+                    imgWrap.onclick = () => window.location.href = '/package/' + p.id;
                 }
 
                 const btnBuy = card.querySelector('.btn-buy-card');
                 if (btnBuy) {
                     btnBuy.addEventListener('click', (e) => {
                         e.preventDefault();
+                        e.stopPropagation();
                         initiateBuy(p.id);
                     });
                 }
@@ -3113,12 +3112,471 @@ const adminHTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
+function buildProductPageHTML(p, allProducts = [], allReviews = []) {
+    const relatedProducts = allProducts.filter(item => String(item.id) !== String(p.id)).slice(0, 3);
+    const isSub = p.isSubscription;
+    const priceFormatted = Number(p.price).toFixed(2);
+    const mediaList = (p.media && p.media.length > 0) ? p.media : [p.image];
+
+    // Escape and format markdown documentation
+    const formattedDocs = (p.docs || 'No documentation provided.')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/^### (.*$)/gim, '<h3 style="color:#38bdf8;margin:1.2rem 0 0.5rem;">$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2 style="color:#ffffff;margin:1.5rem 0 0.6rem;">$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1 style="color:#ffffff;margin:1.8rem 0 0.8rem;">$1</h1>')
+        .replace(/^\d+\.\s+(.*$)/gim, '<li style="margin-bottom:0.4rem;">$1</li>')
+        .replace(/`([^`]+)`/g, '<code style="background:rgba(2,132,199,0.18);border:1px solid rgba(56,189,248,0.3);padding:0.2rem 0.45rem;border-radius:6px;color:#38bdf8;font-family:monospace;">$1</code>')
+        .replace(/\n/g, '<br/>');
+
+    // Build thumbnail strip items
+    let thumbsHTML = '';
+    mediaList.forEach((mUrl, idx) => {
+        thumbsHTML += '<div class="p-thumb ' + (idx === 0 ? 'active' : '') + '" onclick="switchMedia(\'' + mUrl + '\', \'image\', this)">' +
+            '<img src="' + mUrl + '" alt="Thumbnail ' + (idx + 1) + '" />' +
+        '</div>';
+    });
+
+    if (p.youtubeUrl) {
+        thumbsHTML += '<div class="p-thumb p-thumb-video" onclick="switchMedia(\'' + p.youtubeUrl + '\', \'video\', this)">' +
+            '<svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>' +
+            '<span>Trailer</span>' +
+        '</div>';
+    }
+
+    // Related cards HTML
+    let relatedHTML = '';
+    relatedProducts.forEach(rel => {
+        relatedHTML += '<div class="product-card" onclick="window.location.href=\'/package/' + rel.id + '\'" style="cursor:pointer;">' +
+            '<div class="card-img-wrapper">' +
+                '<img src="' + rel.image + '" alt="' + rel.name + '" />' +
+                '<span class="card-badge ' + rel.badgeColor + '">' + rel.badge + '</span>' +
+                '<span class="resmon-pill">' + rel.resmon + '</span>' +
+            '</div>' +
+            '<div class="card-content">' +
+                '<div class="card-category">' + rel.categoryName + '</div>' +
+                '<h3 class="card-name">' + rel.name + '</h3>' +
+                '<div class="card-meta">' +
+                    '<div><span class="card-price">$' + Number(rel.price).toFixed(2) + '</span> <span class="card-period">' + (rel.isSubscription ? '/ mo' : 'one-time') + '</span></div>' +
+                    '<span class="framework-tag">' + rel.framework + '</span>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+    });
+
+    return '<!DOCTYPE html>' +
+'<html lang="en">' +
+'<head>' +
+'    <meta charset="UTF-8">' +
+'    <meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+'    <title>' + p.name + ' - Mirage Store</title>' +
+'    <link rel="preconnect" href="https://fonts.googleapis.com">' +
+'    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
+'    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">' +
+'    <style>' +
+'        :root {' +
+'            --brand: #0284c7;' +
+'            --brand-hover: #0369a1;' +
+'            --brand-light: #38bdf8;' +
+'            --brand-glow: rgba(56, 189, 248, 0.35);' +
+'            --dark-bg: #070b14;' +
+'            --card-bg: rgba(13, 20, 36, 0.85);' +
+'            --card-border: rgba(255, 255, 255, 0.08);' +
+'            --text-main: #f8fafc;' +
+'            --text-muted: #94a3b8;' +
+'            --text-dim: #64748b;' +
+'        }' +
+'        * { margin: 0; padding: 0; box-sizing: border-box; }' +
+'        body {' +
+'            background-color: var(--dark-bg);' +
+'            background-image: ' +
+'                radial-gradient(at 0% 0%, rgba(2, 132, 199, 0.15) 0px, transparent 50%),' +
+'                radial-gradient(at 100% 0%, rgba(56, 189, 248, 0.12) 0px, transparent 50%),' +
+'                radial-gradient(at 50% 50%, rgba(13, 20, 36, 0.95) 0px, transparent 100%);' +
+'            min-height: 100vh;' +
+'            font-family: \'Plus Jakarta Sans\', system-ui, -apple-system, sans-serif;' +
+'            color: var(--text-main);' +
+'            line-height: 1.6;' +
+'        }' +
+'        .navbar { border-bottom: 1px solid var(--card-border); background: rgba(7, 11, 20, 0.94); backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 50; }' +
+'        .nav-container { max-width: 1380px; margin: 0 auto; padding: 0.85rem 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; }' +
+'        .brand-logo { display: flex; align-items: center; gap: 0.85rem; text-decoration: none; color: #ffffff; }' +
+'        .brand-logo-img { width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 0 12px var(--brand-glow)); }' +
+'        .brand-title { font-size: 1.35rem; font-weight: 900; letter-spacing: -0.02em; }' +
+'        .brand-title span { color: var(--brand-light); }' +
+'        .nav-links { display: flex; align-items: center; gap: 1.75rem; list-style: none; }' +
+'        @media (max-width: 1040px) { .nav-links { display: none; } }' +
+'        .nav-links a { text-decoration: none; color: var(--text-muted); font-size: 0.88rem; font-weight: 700; transition: color 0.2s; }' +
+'        .nav-links a:hover { color: var(--brand-light); }' +
+'        .nav-actions { display: flex; align-items: center; gap: 0.85rem; }' +
+'        .cfx-user-container { position: relative; }' +
+'        .cfx-login-btn { background: linear-gradient(135deg, rgba(2, 132, 199, 0.25), rgba(56, 189, 248, 0.15)); border: 1px solid rgba(56, 189, 248, 0.4); color: #ffffff; font-size: 0.85rem; font-weight: 700; padding: 0.55rem 1.1rem; border-radius: 12px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; transition: all 0.25s; }' +
+'        .cfx-login-btn:hover { background: var(--brand); box-shadow: 0 0 16px var(--brand-glow); }' +
+'        .cfx-mini-logo { width: 20px; height: 20px; border-radius: 4px; object-fit: contain; }' +
+'        .cfx-profile-dropdown { position: relative; }' +
+'        .cfx-user-pill { display: flex; align-items: center; gap: 0.65rem; background: rgba(13, 20, 36, 0.9); border: 1px solid rgba(56, 189, 248, 0.35); padding: 0.4rem 0.85rem; border-radius: 14px; cursor: pointer; }' +
+'        .cfx-profile-dropdown:hover .cfx-user-pill { border-color: var(--brand-light); background: rgba(2, 132, 199, 0.2); }' +
+'        .cfx-user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--brand-light); }' +
+'        .cfx-user-meta { display: flex; flex-direction: column; text-align: left; }' +
+'        .cfx-username { font-size: 0.85rem; font-weight: 800; color: #fff; line-height: 1.2; }' +
+'        .cfx-badge { font-size: 0.68rem; font-weight: 700; color: var(--brand-light); }' +
+'        .cfx-chevron { color: var(--text-muted); transition: transform 0.2s; }' +
+'        .cfx-profile-dropdown:hover .cfx-chevron { transform: rotate(180deg); }' +
+'        .cfx-dropdown-menu { position: absolute; top: 100%; right: 0; width: 220px; background: rgba(7, 11, 20, 0.98); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 14px; padding: 0.5rem; box-shadow: 0 16px 36px rgba(0, 0, 0, 0.8); backdrop-filter: blur(24px); display: none; flex-direction: column; gap: 0.35rem; z-index: 100; margin-top: 6px; }' +
+'        .cfx-dropdown-menu::before { content: \'\'; position: absolute; top: -12px; left: 0; right: 0; height: 12px; }' +
+'        .cfx-profile-dropdown:hover .cfx-dropdown-menu, .cfx-dropdown-menu:hover { display: flex; }' +
+'        .cfx-menu-item { display: flex; align-items: center; gap: 0.65rem; padding: 0.65rem 0.85rem; border-radius: 10px; font-size: 0.82rem; font-weight: 700; color: var(--text-main); text-decoration: none; border: none; background: transparent; cursor: pointer; width: 100%; transition: all 0.2s; }' +
+'        .cfx-menu-item svg { flex-shrink: 0; color: var(--brand-light); }' +
+'        .cfx-menu-item:hover { background: rgba(2, 132, 199, 0.15); color: var(--brand-light); }' +
+'        .cfx-logout-btn { color: #f87171 !important; border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 0.25rem; padding-top: 0.65rem; }' +
+'        .cfx-logout-btn svg { color: #f87171 !important; }' +
+'        .cfx-logout-btn:hover { background: rgba(239, 68, 68, 0.15) !important; color: #fca5a5 !important; }' +
+'        .discord-btn { background: #5865F2; color: #ffffff; font-size: 0.85rem; font-weight: 700; text-decoration: none; padding: 0.55rem 1rem; border-radius: 12px; display: flex; align-items: center; gap: 0.4rem; }' +
+'        .discord-btn:hover { background: #4752c4; }' +
+'        .page-container { max-width: 1380px; margin: 0 auto; padding: 2rem 1.5rem 6rem; }' +
+'        .breadcrumb-bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }' +
+'        .back-btn { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: #ffffff; font-size: 0.88rem; font-weight: 700; padding: 0.55rem 1.1rem; border-radius: 12px; text-decoration: none; transition: all 0.2s; }' +
+'        .back-btn:hover { background: rgba(2, 132, 199, 0.2); border-color: var(--brand-light); color: var(--brand-light); transform: translateX(-2px); }' +
+'        .breadcrumbs { display: flex; align-items: center; gap: 0.6rem; font-size: 0.85rem; color: var(--text-muted); }' +
+'        .breadcrumbs a { color: var(--text-muted); text-decoration: none; }' +
+'        .breadcrumbs a:hover { color: var(--brand-light); }' +
+'        .breadcrumbs span.current { color: #ffffff; font-weight: 700; }' +
+'        .product-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 2.5rem; margin-bottom: 3.5rem; }' +
+'        @media (max-width: 1040px) { .product-layout { grid-template-columns: 1fr; } }' +
+'        .media-showcase { display: flex; flex-direction: column; gap: 1rem; }' +
+'        .main-viewer-box { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; background: #000000; border-radius: 20px; border: 1px solid var(--card-border); overflow: hidden; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(2, 132, 199, 0.1); }' +
+'        .main-viewer-box img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }' +
+'        .main-viewer-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
+'        .thumbs-row { display: flex; gap: 0.75rem; overflow-x: auto; padding-bottom: 0.5rem; scrollbar-width: thin; }' +
+'        .p-thumb { flex-shrink: 0; width: 90px; height: 56px; border-radius: 10px; overflow: hidden; border: 2px solid transparent; cursor: pointer; background: #000; transition: all 0.2s; position: relative; }' +
+'        .p-thumb img { width: 100%; height: 100%; object-fit: cover; }' +
+'        .p-thumb:hover { border-color: rgba(56, 189, 248, 0.6); transform: translateY(-2px); }' +
+'        .p-thumb.active { border-color: var(--brand-light); box-shadow: 0 0 12px var(--brand-glow); }' +
+'        .p-thumb-video { display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f172a, #0369a1); color: #ffffff; font-size: 0.7rem; font-weight: 800; gap: 0.2rem; }' +
+'        .info-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2.25rem; display: flex; flex-direction: column; gap: 1.5rem; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4); }' +
+'        .top-tags { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }' +
+'        .badge-pill { padding: 0.35rem 0.85rem; border-radius: 8px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }' +
+'        .badge-pill.accent { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }' +
+'        .badge-pill.brand { background: rgba(2, 132, 199, 0.15); color: #38bdf8; border: 1px solid rgba(2, 132, 199, 0.4); }' +
+'        .badge-pill.purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }' +
+'        .badge-pill.orange { background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.4); }' +
+'        .escrow-pill { display: flex; align-items: center; gap: 0.4rem; background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.35); color: #4ade80; font-size: 0.75rem; font-weight: 800; padding: 0.35rem 0.85rem; border-radius: 8px; }' +
+'        .product-title { font-size: 2.2rem; font-weight: 900; letter-spacing: -0.02em; color: #ffffff; line-height: 1.2; }' +
+'        .meta-chips { display: flex; gap: 0.75rem; flex-wrap: wrap; }' +
+'        .chip { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); padding: 0.4rem 0.85rem; border-radius: 10px; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; }' +
+'        .chip span { color: #ffffff; }' +
+'        .price-box { background: rgba(7, 11, 20, 0.75); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 16px; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }' +
+'        .price-val { font-size: 2rem; font-weight: 900; color: #ffffff; }' +
+'        .price-period { font-size: 0.85rem; color: var(--text-muted); margin-left: 0.35rem; }' +
+'        .btn-buy-lg { width: 100%; background: linear-gradient(135deg, var(--brand), var(--brand-hover)); color: #ffffff; border: none; padding: 1.15rem 2rem; border-radius: 16px; font-size: 1.05rem; font-weight: 900; letter-spacing: 0.03em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.75rem; box-shadow: 0 8px 25px var(--brand-glow); transition: all 0.25s; }' +
+'        .btn-buy-lg:hover { background: linear-gradient(135deg, var(--brand-light), var(--brand)); box-shadow: 0 12px 35px rgba(56, 189, 248, 0.5); transform: translateY(-2px); }' +
+'        .btn-buy-lg:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }' +
+'        .trust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--card-border); }' +
+'        .trust-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); }' +
+'        .trust-item svg { color: var(--brand-light); flex-shrink: 0; }' +
+'        .tabs-wrapper { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; overflow: hidden; margin-bottom: 3.5rem; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4); }' +
+'        .tabs-header { display: flex; border-bottom: 1px solid var(--card-border); background: rgba(7, 11, 20, 0.6); overflow-x: auto; }' +
+'        .tab-btn { padding: 1.25rem 2rem; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-muted); font-size: 0.95rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 0.6rem; transition: all 0.2s; white-space: nowrap; }' +
+'        .tab-btn:hover { color: #ffffff; }' +
+'        .tab-btn.active { color: var(--brand-light); border-bottom-color: var(--brand-light); background: rgba(2, 132, 199, 0.08); }' +
+'        .tab-content { padding: 2.5rem; font-size: 0.95rem; color: #cbd5e1; line-height: 1.8; }' +
+'        .tab-pane { display: none; }' +
+'        .tab-pane.active { display: block; }' +
+'        .section-header { margin-bottom: 1.75rem; font-size: 1.5rem; font-weight: 900; color: #ffffff; letter-spacing: -0.02em; }' +
+'        .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; margin-bottom: 3.5rem; }' +
+'        .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; overflow: hidden; transition: all 0.3s ease; display: flex; flex-direction: column; }' +
+'        .product-card:hover { border-color: var(--brand-light); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px var(--brand-glow); transform: translateY(-4px); }' +
+'        .card-img-wrapper { position: relative; height: 190px; overflow: hidden; }' +
+'        .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }' +
+'        .card-badge { position: absolute; top: 1rem; left: 1rem; padding: 0.35rem 0.75rem; border-radius: 8px; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; }' +
+'        .resmon-pill { position: absolute; top: 1rem; right: 1rem; background: rgba(0, 0, 0, 0.75); border: 1px solid rgba(255, 255, 255, 0.15); padding: 0.3rem 0.65rem; border-radius: 8px; font-size: 0.72rem; font-weight: 700; color: var(--brand-light); backdrop-filter: blur(8px); }' +
+'        .card-content { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }' +
+'        .card-category { font-size: 0.75rem; font-weight: 800; color: var(--brand-light); text-transform: uppercase; margin-bottom: 0.35rem; }' +
+'        .card-name { font-size: 1.15rem; font-weight: 800; color: #fff; margin-bottom: 1rem; }' +
+'        .card-meta { display: flex; justify-content: space-between; align-items: center; }' +
+'        .card-price { font-size: 1.25rem; font-weight: 900; color: #fff; }' +
+'        .card-period { font-size: 0.75rem; color: var(--text-muted); }' +
+'        .framework-tag { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }' +
+'        .footer { border-top: 1px solid var(--card-border); padding: 4rem 1.5rem 2.5rem; background: #04070e; text-align: center; color: var(--text-dim); font-size: 0.85rem; }' +
+'    </style>' +
+'</head>' +
+'<body>' +
+'    <header class="navbar">' +
+'        <div class="nav-container">' +
+'            <a href="/" class="brand-logo">' +
+'                <img src="/public/images/logo.png" alt="Mirage Logo" class="brand-logo-img" />' +
+'                <div class="brand-title">MIRAGE <span>STORE</span></div>' +
+'            </a>' +
+'            <ul class="nav-links">' +
+'                <li><a href="/#products">HOME</a></li>' +
+'                <li><a href="/#products">SCRIPTS</a></li>' +
+'                <li><a href="/#products">VEHICLES</a></li>' +
+'                <li><a href="/#products">MLOS</a></li>' +
+'                <li><a href="/#reviews">REVIEWS</a></li>' +
+'            </ul>' +
+'            <div class="nav-actions">' +
+'                <div id="cfxUserContainer" class="cfx-user-container">' +
+'                    <button id="cfxLoginBtn" class="cfx-login-btn" onclick="loginWithCfx()">' +
+'                        <img src="https://forum.cfx.re/uploads/default/original/4X/3/0/0/30064d12c8ff4978be77bb326e57973eeaa89bf0.png" alt="CFX" class="cfx-mini-logo" onerror="this.src=\'/public/images/logo.png\'" />' +
+'                        <span>Sign In with Cfx.re</span>' +
+'                    </button>' +
+'                    <div id="cfxProfileDropdown" class="cfx-profile-dropdown" style="display: none;">' +
+'                        <div class="cfx-user-pill">' +
+'                            <img id="cfxUserAvatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100" alt="CFX Avatar" class="cfx-user-avatar" />' +
+'                            <div class="cfx-user-meta">' +
+'                                <span id="cfxUserName" class="cfx-username">FiveM User</span>' +
+'                                <span class="cfx-badge">Keymaster Active</span>' +
+'                            </div>' +
+'                            <svg class="cfx-chevron" width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>' +
+'                        </div>' +
+'                        <div class="cfx-dropdown-menu">' +
+'                            <a href="https://keymaster.fivem.net" target="_blank" class="cfx-menu-item">' +
+'                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clip-rule="evenodd"/></svg>' +
+'                                <span>My Keymaster Assets</span>' +
+'                            </a>' +
+'                            <button class="cfx-menu-item cfx-logout-btn" onclick="logoutCfx()">' +
+'                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>' +
+'                                <span>Log Out</span>' +
+'                            </button>' +
+'                        </div>' +
+'                    </div>' +
+'                </div>' +
+'                <a id="discordLink" href="https://discord.gg/fivem" target="_blank" class="discord-btn">' +
+'                    <svg width="17" height="17" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>' +
+'                    <span>Discord</span>' +
+'                </a>' +
+'            </div>' +
+'        </div>' +
+'    </header>' +
+'    <div class="page-container">' +
+'        <div class="breadcrumb-bar">' +
+'            <a href="/#products" class="back-btn">' +
+'                <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>' +
+'                <span>Back to Catalog</span>' +
+'            </a>' +
+'            <div class="breadcrumbs">' +
+'                <a href="/">Home</a>' +
+'                <span>/</span>' +
+'                <a href="/#products">' + p.categoryName + '</a>' +
+'                <span>/</span>' +
+'                <span class="current">' + p.name + '</span>' +
+'            </div>' +
+'        </div>' +
+'        <div class="product-layout">' +
+'            <div class="media-showcase">' +
+'                <div class="main-viewer-box" id="mainViewer">' +
+'                    <img id="mainImg" src="' + mediaList[0] + '" alt="' + p.name + '" />' +
+'                </div>' +
+'                <div class="thumbs-row" id="thumbsStrip">' + thumbsHTML + '</div>' +
+'            </div>' +
+'            <div class="info-box">' +
+'                <div class="top-tags">' +
+'                    <span class="badge-pill ' + p.badgeColor + '">' + p.badge + '</span>' +
+'                    <span class="escrow-pill">' +
+'                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' +
+'                        <span>CFX.re Escrow Certified</span>' +
+'                    </span>' +
+'                </div>' +
+'                <h1 class="product-title">' + p.name + '</h1>' +
+'                <div class="meta-chips">' +
+'                    <div class="chip">' +
+'                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/></svg>' +
+'                        <span>' + p.resmon + ' Resmon</span>' +
+'                    </div>' +
+'                    <div class="chip">' +
+'                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd"/></svg>' +
+'                        <span>' + p.framework + '</span>' +
+'                    </div>' +
+'                </div>' +
+'                <p style="color: var(--text-muted); font-size: 0.95rem;">' + p.shortDesc + '</p>' +
+'                <div class="price-box">' +
+'                    <div>' +
+'                        <span class="price-val">$' + priceFormatted + '</span>' +
+'                        <span class="price-period">' + (isSub ? '/ month' : 'one-time') + '</span>' +
+'                    </div>' +
+'                    <div style="font-size: 0.75rem; color: #4ade80; font-weight: 800;">✓ In Stock & Ready</div>' +
+'                </div>' +
+'                <button class="btn-buy-lg" id="buyBtn" onclick="initiateBuy(' + p.id + ')">' +
+'                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd"/></svg>' +
+'                    <span id="buyBtnText">Buy with CFX.re Keymaster</span>' +
+'                </button>' +
+'                <div class="trust-grid">' +
+'                    <div class="trust-item"><svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span>CFX Escrow Safe</span></div>' +
+'                    <div class="trust-item"><svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/></svg><span>Instant Delivery</span></div>' +
+'                    <div class="trust-item"><svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg><span>Full Escrow</span></div>' +
+'                    <div class="trust-item"><svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"/></svg><span>24/7 Discord Support</span></div>' +
+'                </div>' +
+'            </div>' +
+'        </div>' +
+'        <div class="tabs-wrapper">' +
+'            <div class="tabs-header">' +
+'                <button class="tab-btn active" onclick="switchTab(\'desc\', this)"><svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg><span>Overview & Features</span></button>' +
+'                <button class="tab-btn" onclick="switchTab(\'video\', this)"><svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/></svg><span>Video Showcase</span></button>' +
+'                <button class="tab-btn" onclick="switchTab(\'docs\', this)"><svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg><span>Installation Guide</span></button>' +
+'            </div>' +
+'            <div class="tab-content">' +
+'                <div class="tab-pane active" id="tab-desc">' +
+'                    <div style="font-size: 1rem; line-height: 1.8;">' + p.fullDesc + '</div>' +
+'                </div>' +
+'                <div class="tab-pane" id="tab-video">' +
+'                    <div style="position: relative; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 14px; overflow: hidden;">' +
+'                        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/' + (p.youtubeUrl ? (p.youtubeUrl.includes('v=') ? p.youtubeUrl.split('v=')[1].split('&')[0] : p.youtubeUrl.split('/').pop()) : 'M7lc1UVf-VE') + '?enablejsapi=1&rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="position: absolute; top:0; left:0;"></iframe>' +
+'                    </div>' +
+'                </div>' +
+'                <div class="tab-pane" id="tab-docs">' +
+'                    <div>' + formattedDocs + '</div>' +
+'                </div>' +
+'            </div>' +
+'        </div>' +
+'        <h2 class="section-header">You May Also Like</h2>' +
+'        <div class="related-grid">' + relatedHTML + '</div>' +
+'    </div>' +
+'    <footer class="footer"><p>© 2026 Mirage Store Enterprise. All rights reserved. Not affiliated with Rockstar Games or Take-Two Interactive.</p></footer>' +
+'    <script>' +
+'        function switchMedia(url, type, element) {' +
+'            const viewer = document.getElementById("mainViewer");' +
+'            document.querySelectorAll(".p-thumb").forEach(function(el) { el.classList.remove("active"); });' +
+'            if (element) element.classList.add("active");' +
+'            if (type === "video") {' +
+'                var id = "M7lc1UVf-VE";' +
+'                if (url.indexOf("v=") !== -1) id = url.split("v=")[1].split("&")[0];' +
+'                else if (url.indexOf("youtu.be/") !== -1) id = url.split("youtu.be/")[1].split("?")[0];' +
+'                else if (url.indexOf("/embed/") !== -1) id = url.split("/embed/")[1].split("?")[0];' +
+'                viewer.innerHTML = "<iframe width=\'100%\' height=\'100%\' src=\'https://www.youtube.com/embed/" + id + "?autoplay=1&enablejsapi=1&rel=0\' frameborder=\'0\' allow=\'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\' referrerpolicy=\'strict-origin-when-cross-origin\' allowfullscreen></iframe>";' +
+'            } else {' +
+'                viewer.innerHTML = "<img id=\'mainImg\' src=\'" + url + "\' alt=\'Showcase Media\' />";' +
+'            }' +
+'        }' +
+'        function switchTab(tabId, element) {' +
+'            document.querySelectorAll(".tab-btn").forEach(function(btn) { btn.classList.remove("active"); });' +
+'            document.querySelectorAll(".tab-pane").forEach(function(pane) { pane.classList.remove("active"); });' +
+'            if (element) element.classList.add("active");' +
+'            var target = document.getElementById("tab-" + tabId);' +
+'            if (target) target.classList.add("active");' +
+'        }' +
+'        async function initiateBuy(packageId) {' +
+'            var btn = document.getElementById("buyBtn");' +
+'            var text = document.getElementById("buyBtnText");' +
+'            if (btn) btn.disabled = true;' +
+'            if (text) text.innerText = "Creating Basket...";' +
+'            try {' +
+'                var urlParams = new URLSearchParams(window.location.search);' +
+'                var basketId = urlParams.get("basketId") || sessionStorage.getItem("tebex_basket_id");' +
+'                var response = await fetch("/api/create-checkout", {' +
+'                    method: "POST",' +
+'                    headers: { "Content-Type": "application/json" },' +
+'                    body: JSON.stringify({ packageId: packageId, basketId: basketId, returnBaseUrl: window.location.origin })' +
+'                });' +
+'                var data = await response.json();' +
+'                if (data.basketIdent) {' +
+'                    sessionStorage.setItem("tebex_basket_id", data.basketIdent);' +
+'                }' +
+'                if (data.requiresAuth && data.authUrl) {' +
+'                    if (text) text.innerText = "Redirecting to CFX.re...";' +
+'                    window.location.href = data.authUrl;' +
+'                    return;' +
+'                }' +
+'                if (data.checkoutUrl) {' +
+'                    window.location.href = data.checkoutUrl;' +
+'                    return;' +
+'                }' +
+'                if (data.error) {' +
+'                    alert("Error: " + data.error);' +
+'                }' +
+'            } catch (err) {' +
+'                alert("Connection error: " + err.message);' +
+'            } finally {' +
+'                if (btn) btn.disabled = false;' +
+'                if (text) text.innerText = "Buy with CFX.re Keymaster";' +
+'            }' +
+'        }' +
+'        async function initCfxUser() {' +
+'            try {' +
+'                var urlParams = new URLSearchParams(window.location.search);' +
+'                var basketId = urlParams.get("basketId") || sessionStorage.getItem("tebex_basket_id");' +
+'                var savedUser = null;' +
+'                try { savedUser = JSON.parse(localStorage.getItem("cfx_user")); } catch (e) {}' +
+'                if (basketId) {' +
+'                    var res = await fetch("/api/user/profile?basketId=" + encodeURIComponent(basketId));' +
+'                    var data = await res.json();' +
+'                    if (data && data.loggedIn) {' +
+'                        savedUser = data;' +
+'                        localStorage.setItem("cfx_user", JSON.stringify(data));' +
+'                    }' +
+'                }' +
+'                renderCfxUser(savedUser);' +
+'            } catch (err) {' +
+'                console.warn("CFX User Init Error:", err);' +
+'            }' +
+'        }' +
+'        function renderCfxUser(user) {' +
+'            var loginBtn = document.getElementById("cfxLoginBtn");' +
+'            var profileDropdown = document.getElementById("cfxProfileDropdown");' +
+'            var userAvatar = document.getElementById("cfxUserAvatar");' +
+'            var userName = document.getElementById("cfxUserName");' +
+'            if (user && user.loggedIn) {' +
+'                if (loginBtn) loginBtn.style.display = "none";' +
+'                if (profileDropdown) profileDropdown.style.display = "block";' +
+'                if (userName) userName.innerText = user.username;' +
+'                if (userAvatar) {' +
+'                    userAvatar.src = user.avatar || ("https://forum.cfx.re/user_avatar/forum.cfx.re/" + encodeURIComponent(user.username) + "/120/1.png");' +
+'                    userAvatar.onerror = function() { this.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100"; };' +
+'                }' +
+'            } else {' +
+'                if (loginBtn) loginBtn.style.display = "flex";' +
+'                if (profileDropdown) profileDropdown.style.display = "none";' +
+'            }' +
+'        }' +
+'        async function loginWithCfx() {' +
+'            var btn = document.getElementById("cfxLoginBtn");' +
+'            if (btn) btn.innerHTML = "<span>Connecting to Cfx.re...</span>";' +
+'            try {' +
+'                var res = await fetch("/api/create-checkout", {' +
+'                    method: "POST",' +
+'                    headers: { "Content-Type": "application/json" },' +
+'                    body: JSON.stringify({ packageId: ' + p.id + ', returnBaseUrl: window.location.origin })' +
+'                });' +
+'                var data = await res.json();' +
+'                if (data && data.authUrl) { window.location.href = data.authUrl; }' +
+'                else if (data && data.checkoutUrl) { window.location.href = data.checkoutUrl; }' +
+'            } catch (e) {' +
+'                alert("Failed to connect to CFX login");' +
+'                if (btn) btn.innerHTML = "<img src=\'https://forum.cfx.re/uploads/default/original/4X/3/0/0/30064d12c8ff4978be77bb326e57973eeaa89bf0.png\' class=\'cfx-mini-logo\' /> <span>Sign In with Cfx.re</span>";' +
+'            }' +
+'        }' +
+'        function logoutCfx() {' +
+'            localStorage.removeItem("cfx_user");' +
+'            sessionStorage.removeItem("tebex_basket_id");' +
+'            if (window.history.replaceState) { window.history.replaceState(null, null, window.location.pathname); }' +
+'            renderCfxUser(null);' +
+'            window.location.reload();' +
+'        }' +
+'        window.addEventListener("DOMContentLoaded", initCfxUser);' +
+'    </script>' +
+'</body>' +
+'</html>';
+}
+
 // ===================================================
 // 9. ADVANCED ENTERPRISE API ROUTES
 // ===================================================
 
 app.get('/', (req, res) => {
     res.send(storefrontHTML);
+});
+
+app.get('/package/:id', async (req, res) => {
+    const store = cachedStoreData || await syncTebexStore();
+    const pkg = (store?.products || []).find(p => String(p.id) === String(req.params.id) || p.slug === req.params.id);
+    if (!pkg) {
+        return res.redirect('/#products');
+    }
+    res.send(buildProductPageHTML(pkg, store.products || [], store.reviews || []));
+});
+
+app.get('/product/:id', (req, res) => {
+    res.redirect('/package/' + req.params.id);
 });
 
 app.get('/admin', (req, res) => {
