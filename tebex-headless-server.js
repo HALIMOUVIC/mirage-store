@@ -3117,17 +3117,18 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
     const isSub = p.isSubscription;
     const priceFormatted = Number(p.price).toFixed(2);
     const mediaList = (p.media && p.media.length > 0) ? p.media : [p.image];
+    const resourceName = (p.slug || p.name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'mirage_resource');
 
     // Escape and format markdown documentation
-    const formattedDocs = (p.docs || 'No documentation provided.')
+    const formattedDocs = (p.docs || 'No extra documentation notes.')
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
-        .replace(/^### (.*$)/gim, '<h3 style="color:#38bdf8;margin:1.2rem 0 0.5rem;">$1</h3>')
-        .replace(/^## (.*$)/gim, '<h2 style="color:#ffffff;margin:1.5rem 0 0.6rem;">$1</h2>')
-        .replace(/^# (.*$)/gim, '<h1 style="color:#ffffff;margin:1.8rem 0 0.8rem;">$1</h1>')
-        .replace(/^\d+\.\s+(.*$)/gim, '<li style="margin-bottom:0.4rem;">$1</li>')
-        .replace(/`([^`]+)`/g, '<code style="background:rgba(2,132,199,0.18);border:1px solid rgba(56,189,248,0.3);padding:0.2rem 0.45rem;border-radius:6px;color:#38bdf8;font-family:monospace;">$1</code>')
+        .replace(/^### (.*$)/gim, '<h3 style="color:#38bdf8;font-size:0.95rem;font-weight:700;margin:1rem 0 0.4rem;">$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2 style="color:#ffffff;font-size:1.05rem;font-weight:800;margin:1.2rem 0 0.5rem;">$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1 style="color:#ffffff;font-size:1.15rem;font-weight:800;margin:1.4rem 0 0.6rem;">$1</h1>')
+        .replace(/^\d+\.\s+(.*$)/gim, '<li style="margin-bottom:0.35rem;color:#cbd5e1;">$1</li>')
+        .replace(/`([^`]+)`/g, '<code style="background:#090e1a;border:1px solid rgba(56,189,248,0.25);padding:0.15rem 0.4rem;border-radius:5px;color:#38bdf8;font-family:monospace;font-size:0.8rem;">$1</code>')
         .replace(/\n/g, '<br/>');
 
     // Build thumbnail strip items
@@ -3140,7 +3141,7 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 
     if (p.youtubeUrl) {
         thumbsHTML += '<div class="p-thumb p-thumb-video" onclick="switchMedia(\'' + p.youtubeUrl + '\', \'video\', this)">' +
-            '<svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>' +
+            '<svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>' +
             '<span>Trailer</span>' +
         '</div>';
     }
@@ -3179,11 +3180,15 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '            --brand: #0284c7;' +
 '            --brand-hover: #0369a1;' +
 '            --brand-light: #38bdf8;' +
-'            --brand-glow: rgba(56, 189, 248, 0.25);' +
-'            --dark-bg: #060911;' +
-'            --card-bg: rgba(11, 17, 30, 0.85);' +
-'            --card-border: rgba(255, 255, 255, 0.07);' +
-'            --text-main: #f1f5f9;' +
+'            --brand-glow: rgba(56, 189, 248, 0.28);' +
+'            --dark-bg: #0c1222;' +
+'            --dark-surface: #111a30;' +
+'            --card-bg: rgba(21, 32, 57, 0.88);' +
+'            --card-inner: rgba(13, 21, 38, 0.9);' +
+'            --card-border: rgba(148, 163, 184, 0.16);' +
+'            --card-border-glow: rgba(56, 189, 248, 0.35);' +
+'            --text-main: #f8fafc;' +
+'            --text-body: #e2e8f0;' +
 '            --text-muted: #94a3b8;' +
 '            --text-dim: #64748b;' +
 '        }' +
@@ -3191,16 +3196,22 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '        body {' +
 '            background-color: var(--dark-bg);' +
 '            background-image: ' +
-'                radial-gradient(at 0% 0%, rgba(2, 132, 199, 0.1) 0px, transparent 50%),' +
-'                radial-gradient(at 100% 0%, rgba(56, 189, 248, 0.08) 0px, transparent 50%),' +
-'                radial-gradient(at 50% 50%, rgba(11, 17, 30, 0.95) 0px, transparent 100%);' +
+'                radial-gradient(ellipse at 50% 0%, rgba(30, 58, 138, 0.22) 0px, transparent 65%),' +
+'                radial-gradient(ellipse at 100% 50%, rgba(2, 132, 199, 0.12) 0px, transparent 50%),' +
+'                radial-gradient(ellipse at 0% 100%, rgba(56, 189, 248, 0.08) 0px, transparent 50%);' +
 '            min-height: 100vh;' +
 '            font-family: \'Plus Jakarta Sans\', system-ui, -apple-system, sans-serif;' +
 '            font-size: 13.5px;' +
-'            color: var(--text-main);' +
+'            color: var(--text-body);' +
 '            line-height: 1.55;' +
 '        }' +
-'        .navbar { border-bottom: 1px solid var(--card-border); background: rgba(6, 9, 17, 0.94); backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 50; }' +
+'        /* Custom Eye-Friendly Scrollbar */' +
+'        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }' +
+'        .custom-scroll::-webkit-scrollbar-track { background: rgba(12, 18, 34, 0.6); border-radius: 6px; }' +
+'        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 6px; }' +
+'        .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.6); }' +
+'        .custom-scroll { scrollbar-width: thin; scrollbar-color: rgba(56, 189, 248, 0.3) rgba(12, 18, 34, 0.6); }' +
+'        .navbar { border-bottom: 1px solid var(--card-border); background: rgba(12, 18, 34, 0.94); backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 50; }' +
 '        .nav-container { max-width: 1240px; margin: 0 auto; padding: 0.75rem 1.25rem; display: flex; justify-content: space-between; align-items: center; gap: 1.25rem; }' +
 '        .brand-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: #ffffff; }' +
 '        .brand-logo-img { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 0 10px var(--brand-glow)); }' +
@@ -3212,62 +3223,62 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '        .nav-links a:hover { color: var(--brand-light); }' +
 '        .nav-actions { display: flex; align-items: center; gap: 0.75rem; }' +
 '        .cfx-user-container { position: relative; }' +
-'        .cfx-login-btn { background: linear-gradient(135deg, rgba(2, 132, 199, 0.2), rgba(56, 189, 248, 0.1)); border: 1px solid rgba(56, 189, 248, 0.3); color: #ffffff; font-size: 0.8rem; font-weight: 700; padding: 0.45rem 0.9rem; border-radius: 10px; display: flex; align-items: center; gap: 0.45rem; cursor: pointer; transition: all 0.2s; }' +
+'        .cfx-login-btn { background: linear-gradient(135deg, rgba(2, 132, 199, 0.25), rgba(56, 189, 248, 0.15)); border: 1px solid rgba(56, 189, 248, 0.35); color: #ffffff; font-size: 0.8rem; font-weight: 700; padding: 0.45rem 0.9rem; border-radius: 10px; display: flex; align-items: center; gap: 0.45rem; cursor: pointer; transition: all 0.2s; }' +
 '        .cfx-login-btn:hover { background: var(--brand); box-shadow: 0 0 14px var(--brand-glow); }' +
 '        .cfx-mini-logo { width: 18px; height: 18px; border-radius: 3px; object-fit: contain; }' +
 '        .cfx-profile-dropdown { position: relative; }' +
-'        .cfx-user-pill { display: flex; align-items: center; gap: 0.55rem; background: rgba(11, 17, 30, 0.9); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.35rem 0.75rem; border-radius: 12px; cursor: pointer; }' +
-'        .cfx-profile-dropdown:hover .cfx-user-pill { border-color: var(--brand-light); background: rgba(2, 132, 199, 0.18); }' +
+'        .cfx-user-pill { display: flex; align-items: center; gap: 0.55rem; background: var(--card-inner); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.35rem 0.75rem; border-radius: 12px; cursor: pointer; }' +
+'        .cfx-profile-dropdown:hover .cfx-user-pill { border-color: var(--brand-light); background: rgba(2, 132, 199, 0.22); }' +
 '        .cfx-user-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--brand-light); }' +
 '        .cfx-user-meta { display: flex; flex-direction: column; text-align: left; }' +
 '        .cfx-username { font-size: 0.8rem; font-weight: 800; color: #fff; line-height: 1.1; }' +
 '        .cfx-badge { font-size: 0.65rem; font-weight: 700; color: var(--brand-light); }' +
 '        .cfx-chevron { color: var(--text-muted); transition: transform 0.2s; }' +
 '        .cfx-profile-dropdown:hover .cfx-chevron { transform: rotate(180deg); }' +
-'        .cfx-dropdown-menu { position: absolute; top: 100%; right: 0; width: 200px; background: rgba(6, 9, 17, 0.98); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 12px; padding: 0.4rem; box-shadow: 0 14px 30px rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px); display: none; flex-direction: column; gap: 0.25rem; z-index: 100; margin-top: 6px; }' +
+'        .cfx-dropdown-menu { position: absolute; top: 100%; right: 0; width: 205px; background: rgba(12, 18, 34, 0.98); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 12px; padding: 0.4rem; box-shadow: 0 14px 30px rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px); display: none; flex-direction: column; gap: 0.25rem; z-index: 100; margin-top: 6px; }' +
 '        .cfx-dropdown-menu::before { content: \'\'; position: absolute; top: -10px; left: 0; right: 0; height: 10px; }' +
 '        .cfx-profile-dropdown:hover .cfx-dropdown-menu, .cfx-dropdown-menu:hover { display: flex; }' +
 '        .cfx-menu-item { display: flex; align-items: center; gap: 0.55rem; padding: 0.55rem 0.75rem; border-radius: 8px; font-size: 0.78rem; font-weight: 700; color: var(--text-main); text-decoration: none; border: none; background: transparent; cursor: pointer; width: 100%; transition: all 0.2s; }' +
 '        .cfx-menu-item svg { flex-shrink: 0; color: var(--brand-light); }' +
-'        .cfx-menu-item:hover { background: rgba(2, 132, 199, 0.15); color: var(--brand-light); }' +
-'        .cfx-logout-btn { color: #f87171 !important; border-top: 1px solid rgba(255, 255, 255, 0.06); margin-top: 0.2rem; padding-top: 0.55rem; }' +
+'        .cfx-menu-item:hover { background: rgba(2, 132, 199, 0.18); color: var(--brand-light); }' +
+'        .cfx-logout-btn { color: #f87171 !important; border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 0.2rem; padding-top: 0.55rem; }' +
 '        .cfx-logout-btn svg { color: #f87171 !important; }' +
-'        .cfx-logout-btn:hover { background: rgba(239, 68, 68, 0.15) !important; color: #fca5a5 !important; }' +
+'        .cfx-logout-btn:hover { background: rgba(239, 68, 68, 0.18) !important; color: #fca5a5 !important; }' +
 '        .discord-btn { background: #5865F2; color: #ffffff; font-size: 0.8rem; font-weight: 700; text-decoration: none; padding: 0.45rem 0.85rem; border-radius: 10px; display: flex; align-items: center; gap: 0.35rem; }' +
 '        .discord-btn:hover { background: #4752c4; }' +
 '        .page-container { max-width: 1240px; margin: 0 auto; padding: 1.5rem 1.25rem 5rem; }' +
 '        .breadcrumb-bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }' +
-'        .back-btn { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--card-border); color: #ffffff; font-size: 0.78rem; font-weight: 700; padding: 0.45rem 0.9rem; border-radius: 10px; text-decoration: none; transition: all 0.2s; }' +
-'        .back-btn:hover { background: rgba(2, 132, 199, 0.18); border-color: var(--brand-light); color: var(--brand-light); transform: translateX(-2px); }' +
+'        .back-btn { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: #ffffff; font-size: 0.78rem; font-weight: 700; padding: 0.45rem 0.9rem; border-radius: 10px; text-decoration: none; transition: all 0.2s; }' +
+'        .back-btn:hover { background: rgba(2, 132, 199, 0.2); border-color: var(--brand-light); color: var(--brand-light); transform: translateX(-2px); }' +
 '        .breadcrumbs { display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; color: var(--text-muted); }' +
 '        .breadcrumbs a { color: var(--text-muted); text-decoration: none; }' +
 '        .breadcrumbs a:hover { color: var(--brand-light); }' +
 '        .breadcrumbs span.current { color: #ffffff; font-weight: 700; }' +
-'        .product-layout { display: grid; grid-template-columns: 1.25fr 1fr; gap: 1.75rem; margin-bottom: 2.5rem; }' +
+'        .product-layout { display: grid; grid-template-columns: 1.25fr 1fr; gap: 1.75rem; margin-bottom: 2rem; }' +
 '        @media (max-width: 980px) { .product-layout { grid-template-columns: 1fr; } }' +
 '        .media-showcase { display: flex; flex-direction: column; gap: 0.75rem; }' +
-'        .main-viewer-box { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; background: #000000; border-radius: 14px; border: 1px solid var(--card-border); overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }' +
+'        .main-viewer-box { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; background: #070b14; border-radius: 14px; border: 1px solid var(--card-border); overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); }' +
 '        .main-viewer-box img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }' +
 '        .main-viewer-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
-'        .thumbs-row { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.4rem; scrollbar-width: thin; }' +
-'        .p-thumb { flex-shrink: 0; width: 74px; height: 46px; border-radius: 8px; overflow: hidden; border: 1.5px solid transparent; cursor: pointer; background: #000; transition: all 0.2s; position: relative; }' +
+'        .thumbs-row { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.4rem; }' +
+'        .p-thumb { flex-shrink: 0; width: 74px; height: 46px; border-radius: 8px; overflow: hidden; border: 1.5px solid transparent; cursor: pointer; background: #070b14; transition: all 0.2s; position: relative; }' +
 '        .p-thumb img { width: 100%; height: 100%; object-fit: cover; }' +
 '        .p-thumb:hover { border-color: rgba(56, 189, 248, 0.6); transform: translateY(-1px); }' +
 '        .p-thumb.active { border-color: var(--brand-light); box-shadow: 0 0 10px var(--brand-glow); }' +
-'        .p-thumb-video { display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f172a, #0369a1); color: #ffffff; font-size: 0.65rem; font-weight: 800; gap: 0.15rem; }' +
+'        .p-thumb-video { display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #111a30, #0369a1); color: #ffffff; font-size: 0.65rem; font-weight: 800; gap: 0.15rem; }' +
 '        .info-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.15rem; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35); }' +
 '        .top-tags { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }' +
 '        .badge-pill { padding: 0.25rem 0.65rem; border-radius: 6px; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; }' +
-'        .badge-pill.accent { background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); }' +
-'        .badge-pill.brand { background: rgba(2, 132, 199, 0.12); color: #38bdf8; border: 1px solid rgba(2, 132, 199, 0.35); }' +
-'        .badge-pill.purple { background: rgba(168, 85, 247, 0.12); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.35); }' +
-'        .badge-pill.orange { background: rgba(249, 115, 22, 0.12); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.35); }' +
-'        .escrow-pill { display: flex; align-items: center; gap: 0.35rem; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #4ade80; font-size: 0.68rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 6px; }' +
+'        .badge-pill.accent { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }' +
+'        .badge-pill.brand { background: rgba(2, 132, 199, 0.15); color: #38bdf8; border: 1px solid rgba(2, 132, 199, 0.4); }' +
+'        .badge-pill.purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }' +
+'        .badge-pill.orange { background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.4); }' +
+'        .escrow-pill { display: flex; align-items: center; gap: 0.35rem; background: rgba(34, 197, 94, 0.14); border: 1px solid rgba(34, 197, 94, 0.35); color: #4ade80; font-size: 0.68rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 6px; }' +
 '        .product-title { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.02em; color: #ffffff; line-height: 1.25; }' +
 '        .meta-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }' +
-'        .chip { background: rgba(255, 255, 255, 0.04); border: 1px solid var(--card-border); padding: 0.3rem 0.65rem; border-radius: 8px; font-size: 0.74rem; font-weight: 700; color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem; }' +
+'        .chip { background: var(--card-inner); border: 1px solid var(--card-border); padding: 0.3rem 0.65rem; border-radius: 8px; font-size: 0.74rem; font-weight: 700; color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem; }' +
 '        .chip span { color: #ffffff; }' +
-'        .price-box { background: rgba(6, 9, 17, 0.75); border: 1px solid rgba(56, 189, 248, 0.15); border-radius: 12px; padding: 0.9rem 1.15rem; display: flex; justify-content: space-between; align-items: center; }' +
+'        .price-box { background: var(--card-inner); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 12px; padding: 0.9rem 1.15rem; display: flex; justify-content: space-between; align-items: center; }' +
 '        .price-val { font-size: 1.4rem; font-weight: 800; color: #ffffff; }' +
 '        .price-period { font-size: 0.75rem; color: var(--text-muted); margin-left: 0.25rem; }' +
 '        .btn-buy-lg { width: 100%; background: linear-gradient(135deg, var(--brand), var(--brand-hover)); color: #ffffff; border: none; padding: 0.85rem 1.5rem; border-radius: 12px; font-size: 0.88rem; font-weight: 800; letter-spacing: 0.02em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.6rem; box-shadow: 0 6px 20px var(--brand-glow); transition: all 0.2s; }' +
@@ -3276,14 +3287,46 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '        .trust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; padding-top: 0.4rem; border-top: 1px solid var(--card-border); }' +
 '        .trust-item { display: flex; align-items: center; gap: 0.45rem; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }' +
 '        .trust-item svg { color: var(--brand-light); flex-shrink: 0; }' +
+'        /* Professional Tabs System */' +
 '        .tabs-wrapper { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; overflow: hidden; margin-bottom: 2.5rem; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35); }' +
-'        .tabs-header { display: flex; border-bottom: 1px solid var(--card-border); background: rgba(6, 9, 17, 0.6); overflow-x: auto; }' +
-'        .tab-btn { padding: 0.85rem 1.5rem; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-muted); font-size: 0.82rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; white-space: nowrap; }' +
-'        .tab-btn:hover { color: #ffffff; }' +
-'        .tab-btn.active { color: var(--brand-light); border-bottom-color: var(--brand-light); background: rgba(2, 132, 199, 0.08); }' +
-'        .tab-content { padding: 1.75rem; font-size: 0.85rem; color: #cbd5e1; line-height: 1.65; }' +
+'        .tabs-header { display: flex; border-bottom: 1px solid var(--card-border); background: rgba(13, 21, 38, 0.9); overflow-x: auto; padding: 0.35rem 0.5rem 0; gap: 0.4rem; }' +
+'        .tab-btn { padding: 0.75rem 1.25rem; background: transparent; border: none; border-radius: 10px 10px 0 0; border-bottom: 2px solid transparent; color: var(--text-muted); font-size: 0.82rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; white-space: nowrap; }' +
+'        .tab-btn:hover { color: #ffffff; background: rgba(255, 255, 255, 0.04); }' +
+'        .tab-btn.active { color: var(--brand-light); border-bottom: 2px solid var(--brand-light); background: rgba(2, 132, 199, 0.12); }' +
+'        .tab-badge { font-size: 0.65rem; background: rgba(56, 189, 248, 0.18); color: #38bdf8; padding: 0.15rem 0.45rem; border-radius: 6px; font-weight: 800; }' +
+'        .tab-content { padding: 1.5rem; font-size: 0.85rem; color: var(--text-body); line-height: 1.65; }' +
 '        .tab-pane { display: none; }' +
 '        .tab-pane.active { display: block; }' +
+'        /* Highlights Grid */' +
+'        .highlights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.85rem; margin-bottom: 1.25rem; }' +
+'        .hl-card { background: var(--card-inner); border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem 1rem; display: flex; align-items: flex-start; gap: 0.75rem; }' +
+'        .hl-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(2, 132, 199, 0.18); color: var(--brand-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.95rem; }' +
+'        .hl-title { font-size: 0.8rem; font-weight: 800; color: #ffffff; line-height: 1.2; margin-bottom: 0.15rem; }' +
+'        .hl-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.35; }' +
+'        /* Description scroll box */' +
+'        .desc-scroll-box { max-height: 380px; overflow-y: auto; padding-right: 0.65rem; background: rgba(11, 18, 33, 0.6); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.25rem; }' +
+'        .desc-scroll-box p { margin-bottom: 0.85rem; color: var(--text-body); }' +
+'        .desc-scroll-box ul, .desc-scroll-box ol { margin-left: 1.25rem; margin-bottom: 0.85rem; }' +
+'        .desc-scroll-box li { margin-bottom: 0.35rem; color: var(--text-body); }' +
+'        /* Video Showcase Cinema Box */' +
+'        .cinema-box { background: #070b14; border: 1px solid var(--card-border); border-radius: 14px; overflow: hidden; }' +
+'        .cinema-bar { background: rgba(13, 21, 38, 0.9); padding: 0.6rem 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); font-size: 0.75rem; font-weight: 700; color: var(--text-muted); }' +
+'        .cinema-dots { display: flex; gap: 0.35rem; }' +
+'        .cinema-dot { width: 10px; height: 10px; border-radius: 50%; }' +
+'        .dot-red { background: #ef4444; } .dot-yellow { background: #f59e0b; } .dot-green { background: #10b981; }' +
+'        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; }' +
+'        .video-wrapper iframe { position: absolute; top:0; left:0; width:100%; height:100%; }' +
+'        .video-footer-tip { padding: 0.65rem 1rem; background: rgba(13, 21, 38, 0.7); font-size: 0.74rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; border-top: 1px solid var(--card-border); }' +
+'        /* Installation Guide Step Cards */' +
+'        .steps-container { display: flex; flex-direction: column; gap: 0.85rem; max-height: 420px; overflow-y: auto; padding-right: 0.5rem; }' +
+'        .step-item { background: var(--card-inner); border: 1px solid var(--card-border); border-radius: 12px; padding: 1rem 1.15rem; display: flex; gap: 0.85rem; align-items: flex-start; }' +
+'        .step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--brand); color: #fff; font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.1rem; }' +
+'        .step-body { flex-grow: 1; }' +
+'        .step-title { font-size: 0.84rem; font-weight: 800; color: #fff; margin-bottom: 0.25rem; }' +
+'        .step-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; }' +
+'        .code-box { margin-top: 0.5rem; background: #060a12; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 0.55rem 0.85rem; display: flex; justify-content: space-between; align-items: center; font-family: monospace; font-size: 0.8rem; color: #38bdf8; }' +
+'        .btn-copy { background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }' +
+'        .btn-copy:hover { background: var(--brand); color: #fff; }' +
 '        .section-header { margin-bottom: 1.25rem; font-size: 1.15rem; font-weight: 800; color: #ffffff; letter-spacing: -0.01em; }' +
 '        .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem; }' +
 '        .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; overflow: hidden; transition: all 0.25s ease; display: flex; flex-direction: column; }' +
@@ -3298,8 +3341,8 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '        .card-meta { display: flex; justify-content: space-between; align-items: center; }' +
 '        .card-price { font-size: 1.05rem; font-weight: 800; color: #fff; }' +
 '        .card-period { font-size: 0.7rem; color: var(--text-muted); }' +
-'        .framework-tag { background: rgba(255, 255, 255, 0.04); border: 1px solid var(--card-border); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.68rem; font-weight: 700; color: var(--text-muted); }' +
-'        .footer { border-top: 1px solid var(--card-border); padding: 3rem 1.25rem 2rem; background: #04070e; text-align: center; color: var(--text-dim); font-size: 0.78rem; }' +
+'        .framework-tag { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.68rem; font-weight: 700; color: var(--text-muted); }' +
+'        .footer { border-top: 1px solid var(--card-border); padding: 3rem 1.25rem 2rem; background: #080d1a; text-align: center; color: var(--text-dim); font-size: 0.78rem; }' +
 '    </style>' +
 '</head>' +
 '<body>' +
@@ -3369,7 +3412,7 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '                <div class="main-viewer-box" id="mainViewer">' +
 '                    <img id="mainImg" src="' + mediaList[0] + '" alt="' + p.name + '" />' +
 '                </div>' +
-'                <div class="thumbs-row" id="thumbsStrip">' + thumbsHTML + '</div>' +
+'                <div class="thumbs-row custom-scroll" id="thumbsStrip">' + thumbsHTML + '</div>' +
 '            </div>' +
 '            <div class="info-box">' +
 '                <div class="top-tags">' +
@@ -3396,7 +3439,7 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '                        <span class="price-val">$' + priceFormatted + '</span>' +
 '                        <span class="price-period">' + (isSub ? '/ month' : 'one-time') + '</span>' +
 '                    </div>' +
-'                    <div style="font-size: 0.72rem; color: #4ade80; font-weight: 700;">✓ In Stock & Instant Delivery</div>' +
+'                    <div style="font-size: 0.72rem; color: #4ade80; font-weight: 700;">✓ In Stock & Instant Keymaster</div>' +
 '                </div>' +
 '                <button class="btn-buy-lg" id="buyBtn" onclick="initiateBuy(' + p.id + ')">' +
 '                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd"/></svg>' +
@@ -3405,28 +3448,114 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '                <div class="trust-grid">' +
 '                    <div class="trust-item"><svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span>CFX Escrow Safe</span></div>' +
 '                    <div class="trust-item"><svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/></svg><span>Instant Delivery</span></div>' +
-'                    <div class="trust-item"><svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg><span>Full Escrow</span></div>' +
-'                    <div class="trust-item"><svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"/></svg><span>24/7 Discord Support</span></div>' +
+'                    <div class="trust-item"><svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg><span>Full Support</span></div>' +
+'                    <div class="trust-item"><svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"/></svg><span>24/7 Discord Help</span></div>' +
 '                </div>' +
 '            </div>' +
 '        </div>' +
 '        <div class="tabs-wrapper">' +
 '            <div class="tabs-header">' +
-'                <button class="tab-btn active" onclick="switchTab(\'desc\', this)"><svg width="15" height="15" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg><span>Overview & Features</span></button>' +
-'                <button class="tab-btn" onclick="switchTab(\'video\', this)"><svg width="15" height="15" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/></svg><span>Video Showcase</span></button>' +
-'                <button class="tab-btn" onclick="switchTab(\'docs\', this)"><svg width="15" height="15" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg><span>Installation Guide</span></button>' +
+'                <button class="tab-btn active" onclick="switchTab(\'desc\', this)">' +
+'                    <svg width="15" height="15" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg>' +
+'                    <span>Overview & Features</span>' +
+'                </button>' +
+'                <button class="tab-btn" onclick="switchTab(\'video\', this)">' +
+'                    <svg width="15" height="15" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/></svg>' +
+'                    <span>Video Showcase</span>' +
+'                    <span class="tab-badge">4K 60FPS</span>' +
+'                </button>' +
+'                <button class="tab-btn" onclick="switchTab(\'docs\', this)">' +
+'                    <svg width="15" height="15" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>' +
+'                    <span>Installation Guide</span>' +
+'                    <span class="tab-badge">Quick Setup</span>' +
+'                </button>' +
 '            </div>' +
 '            <div class="tab-content">' +
+'                <!-- Tab 1: Overview & Features -->' +
 '                <div class="tab-pane active" id="tab-desc">' +
-'                    <div style="font-size: 0.85rem; line-height: 1.65;">' + p.fullDesc + '</div>' +
-'                </div>' +
-'                <div class="tab-pane" id="tab-video">' +
-'                    <div style="position: relative; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 12px; overflow: hidden;">' +
-'                        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/' + (p.youtubeUrl ? (p.youtubeUrl.includes('v=') ? p.youtubeUrl.split('v=')[1].split('&')[0] : p.youtubeUrl.split('/').pop()) : 'M7lc1UVf-VE') + '?enablejsapi=1&rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="position: absolute; top:0; left:0;"></iframe>' +
+'                    <div class="highlights-grid">' +
+'                        <div class="hl-card">' +
+'                            <div class="hl-icon">⚡</div>' +
+'                            <div><div class="hl-title">' + p.resmon + ' Resmon</div><div class="hl-desc">Ultra-optimized loop execution for peak server performance.</div></div>' +
+'                        </div>' +
+'                        <div class="hl-card">' +
+'                            <div class="hl-icon">🛡️</div>' +
+'                            <div><div class="hl-title">CFX.re Escrow</div><div class="hl-desc">Official encrypted asset protection directly into your Keymaster.</div></div>' +
+'                        </div>' +
+'                        <div class="hl-card">' +
+'                            <div class="hl-icon">⚙️</div>' +
+'                            <div><div class="hl-title">' + p.framework + '</div><div class="hl-desc">Pre-configured hooks & ready for immediate drag-and-drop.</div></div>' +
+'                        </div>' +
+'                        <div class="hl-card">' +
+'                            <div class="hl-icon">🔄</div>' +
+'                            <div><div class="hl-title">Lifetime Updates</div><div class="hl-desc">Free continuous feature additions & Discord customer support.</div></div>' +
+'                        </div>' +
+'                    </div>' +
+'                    <div class="desc-scroll-box custom-scroll">' +
+'                        <div style="font-size: 0.85rem; line-height: 1.65; color: var(--text-body);">' + p.fullDesc + '</div>' +
 '                    </div>' +
 '                </div>' +
+'                <!-- Tab 2: Video Showcase -->' +
+'                <div class="tab-pane" id="tab-video">' +
+'                    <div class="cinema-box">' +
+'                        <div class="cinema-bar">' +
+'                            <div class="cinema-dots">' +
+'                                <div class="cinema-dot dot-red"></div>' +
+'                                <div class="cinema-dot dot-yellow"></div>' +
+'                                <div class="cinema-dot dot-green"></div>' +
+'                            </div>' +
+'                            <span>Official Gameplay Showcase • 1080p 60FPS</span>' +
+'                            <span style="color:#38bdf8;">' + p.categoryName + '</span>' +
+'                        </div>' +
+'                        <div class="video-wrapper">' +
+'                            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/' + (p.youtubeUrl ? (p.youtubeUrl.includes('v=') ? p.youtubeUrl.split('v=')[1].split('&')[0] : p.youtubeUrl.split('/').pop()) : 'M7lc1UVf-VE') + '?enablejsapi=1&rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>' +
+'                        </div>' +
+'                        <div class="video-footer-tip">' +
+'                            <svg width="15" height="15" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>' +
+'                            <span>Tip: You can switch between screenshots and video trailer anytime using the media strip at the top.</span>' +
+'                        </div>' +
+'                    </div>' +
+'                </div>' +
+'                <!-- Tab 3: Installation Guide -->' +
 '                <div class="tab-pane" id="tab-docs">' +
-'                    <div>' + formattedDocs + '</div>' +
+'                    <div class="steps-container custom-scroll">' +
+'                        <div class="step-item">' +
+'                            <div class="step-num">1</div>' +
+'                            <div class="step-body">' +
+'                                <div class="step-title">Claim Asset on Keymaster</div>' +
+'                                <div class="step-desc">After completing checkout, go to <a href="https://keymaster.fivem.net/assets" target="_blank" style="color:#38bdf8;text-decoration:underline;">keymaster.fivem.net/assets</a> and download your asset bundle.</div>' +
+'                            </div>' +
+'                        </div>' +
+'                        <div class="step-item">' +
+'                            <div class="step-num">2</div>' +
+'                            <div class="step-body">' +
+'                                <div class="step-title">Extract into Resources Folder</div>' +
+'                                <div class="step-desc">Extract the folder directly into your server\'s <code>resources/[mirage]/</code> directory.</div>' +
+'                            </div>' +
+'                        </div>' +
+'                        <div class="step-item">' +
+'                            <div class="step-num">3</div>' +
+'                            <div class="step-body">' +
+'                                <div class="step-title">Add to server.cfg</div>' +
+'                                <div class="step-desc">Add the ensure command into your server configuration file:</div>' +
+'                                <div class="code-box">' +
+'                                    <span id="cfgEnsureCode">ensure ' + resourceName + '</span>' +
+'                                    <button class="btn-copy" onclick="copyCode(\'ensure ' + resourceName + '\', this)">Copy</button>' +
+'                                </div>' +
+'                            </div>' +
+'                        </div>' +
+'                        <div class="step-item">' +
+'                            <div class="step-num">4</div>' +
+'                            <div class="step-body">' +
+'                                <div class="step-title">Configure & Restart</div>' +
+'                                <div class="step-desc">Customize settings in <code>config.lua</code> to match your server frameworks/economy and restart your server.</div>' +
+'                            </div>' +
+'                        </div>' +
+'                        <div style="margin-top:0.75rem;padding:1rem;background:rgba(11,18,33,0.6);border:1px solid var(--card-border);border-radius:10px;">' +
+'                            <div style="font-weight:800;color:#fff;margin-bottom:0.5rem;font-size:0.82rem;">Additional Technical Documentation:</div>' +
+'                            <div style="font-size:0.82rem;color:var(--text-body);">' + formattedDocs + '</div>' +
+'                        </div>' +
+'                    </div>' +
 '                </div>' +
 '            </div>' +
 '        </div>' +
@@ -3455,6 +3584,21 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '            if (element) element.classList.add("active");' +
 '            var target = document.getElementById("tab-" + tabId);' +
 '            if (target) target.classList.add("active");' +
+'        }' +
+'        function copyCode(text, btn) {' +
+'            navigator.clipboard.writeText(text).then(function() {' +
+'                var originalText = btn.innerText;' +
+'                btn.innerText = "✓ Copied!";' +
+'                btn.style.background = "#10b981";' +
+'                btn.style.borderColor = "#10b981";' +
+'                btn.style.color = "#ffffff";' +
+'                setTimeout(function() {' +
+'                    btn.innerText = originalText;' +
+'                    btn.style.background = "rgba(56, 189, 248, 0.15)";' +
+'                    btn.style.borderColor = "rgba(56, 189, 248, 0.3)";' +
+'                    btn.style.color = "#38bdf8";' +
+'                }, 2000);' +
+'            }).catch(function() { alert("Copied: " + text); });' +
 '        }' +
 '        async function initiateBuy(packageId) {' +
 '            var btn = document.getElementById("buyBtn");' +
