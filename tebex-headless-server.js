@@ -774,18 +774,18 @@ const storefrontHTML = `<!DOCTYPE html>
         .hero-container {
             position: relative;
             z-index: 10;
-            max-width: 1560px;
+            max-width: 1750px;
             margin: 0 auto;
-            padding: 4.5rem 2.5rem;
+            padding: 4.5rem 3.5rem;
             width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 2.5rem;
+            gap: 2rem;
         }
 
         .hero-left-content {
-            max-width: 640px;
+            max-width: 620px;
             flex-shrink: 0;
         }
 
@@ -805,6 +805,7 @@ const storefrontHTML = `<!DOCTYPE html>
             .hero-right-widget {
                 width: 100%;
                 justify-content: flex-start;
+                margin-top: 1.5rem;
             }
             .gta-hero { min-height: auto; }
         }
