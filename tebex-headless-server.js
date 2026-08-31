@@ -3998,8 +3998,9 @@ app.post('/api/webhooks/tebex', async (req, res) => {
     console.log('[Webhook Received]:', event?.type || 'payment.completed');
 
     // Handle Tebex endpoint verification/validation ping
-    if (event?.type === 'validation' || !event || Object.keys(event).length === 0) {
-        return res.json({ success: true, message: 'Webhook endpoint verified successfully' });
+    if (event?.type === 'validation' || event?.type === 'validation.webhook' || (event?.type && event.type.toLowerCase().includes('val')) || !event || Object.keys(event).length === 0) {
+        console.log('[Webhook Validation]: Verified Tebex validation request with ID:', event?.id);
+        return res.status(200).json({ id: event?.id || 'ok', status: 'ok', success: true });
     }
 
     if (event && (event.type === 'payment.completed' || event.subject)) {
