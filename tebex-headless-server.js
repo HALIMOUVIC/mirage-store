@@ -197,25 +197,56 @@ const partnerServers = [
     { name: "Dynasty FiveM", players: "280+ Active", badge: "QBCore" }
 ];
 
-async function syncTebexStore() {
+async function syncTebexStore(force = false) {
     const config = loadStoreConfig();
     try {
-        console.log('[Tebex Sync] Fetching categories and packages from Tebex API...');
-        const res = await fetch(`https://headless.tebex.io/api/accounts/${TEBEX_PUBLIC_TOKEN}/categories?includePackages=1`, {
-            signal: AbortSignal.timeout(8000)
-        });
-        const data = await res.json();
+        const timestamp = Date.now();
+        console.log(`[Tebex Sync] Fetching live categories & packages (force=${force}, t=${timestamp})...`);
+        
+        const [catRes, pkgRes] = await Promise.all([
+            fetch(`https://headless.tebex.io/api/accounts/${TEBEX_PUBLIC_TOKEN}/categories?includePackages=1&_t=${timestamp}`, {
+                headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' },
+                signal: AbortSignal.timeout(8000)
+            }).catch(() => null),
+            fetch(`https://headless.tebex.io/api/accounts/${TEBEX_PUBLIC_TOKEN}/packages?_t=${timestamp}`, {
+                headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' },
+                signal: AbortSignal.timeout(8000)
+            }).catch(() => null)
+        ]);
+
+        const catData = catRes && catRes.ok ? await catRes.json().catch(() => null) : null;
+        const pkgData = pkgRes && pkgRes.ok ? await pkgRes.json().catch(() => null) : null;
 
         let tebexPackages = [];
-        if (data && data.data && Array.isArray(data.data)) {
-            data.data.forEach(cat => {
+        const seenIds = new Set();
+
+        // 1. Direct live packages endpoint (freshest prices)
+        if (pkgData && pkgData.data && Array.isArray(pkgData.data)) {
+            pkgData.data.forEach(pkg => {
+                if (!seenIds.has(pkg.id)) {
+                    seenIds.add(pkg.id);
+                    tebexPackages.push(pkg);
+                }
+            });
+        }
+
+        // 2. Categories endpoint for category metadata
+        if (catData && catData.data && Array.isArray(catData.data)) {
+            catData.data.forEach(cat => {
                 if (cat.packages && Array.isArray(cat.packages)) {
                     cat.packages.forEach(pkg => {
-                        tebexPackages.push({
-                            ...pkg,
-                            category_id: cat.id,
-                            category_name: cat.name
-                        });
+                        const existing = tebexPackages.find(p => p.id === pkg.id);
+                        if (existing) {
+                            existing.category_id = cat.id;
+                            existing.category_name = cat.name;
+                        } else if (!seenIds.has(pkg.id)) {
+                            seenIds.add(pkg.id);
+                            tebexPackages.push({
+                                ...pkg,
+                                category_id: cat.id,
+                                category_name: cat.name
+                            });
+                        }
                     });
                 }
             });
@@ -236,8 +267,8 @@ async function syncTebexStore() {
                 id: pkg.id,
                 name: pkg.name,
                 slug: pkg.slug || 'package-' + pkg.id,
-                category: meta.category || 'scripts',
-                categoryName: meta.categoryName || (pkg.category ? pkg.category.name : 'Scripts & Systems'),
+                category: meta.category || (pkg.category ? (pkg.category.name.toLowerCase().includes('script') ? 'scripts' : (pkg.category.name.toLowerCase().includes('vehic') ? 'vehicles' : 'mlos')) : 'scripts'),
+                categoryName: meta.categoryName || (pkg.category ? pkg.category.name : (pkg.category_name || 'Scripts & Systems')),
                 price: (typeof pkg.total_price === 'number') ? pkg.total_price : ((typeof pkg.base_price === 'number') ? pkg.base_price : (meta.price !== undefined ? meta.price : 0.00)),
                 currency: pkg.currency || 'USD',
                 isSubscription: pkg.type === 'subscription',
@@ -2163,7 +2194,7 @@ const storefrontHTML = `<!DOCTYPE html>
 
         async function loadStore() {
             try {
-                const res = await fetch('/api/store');
+                const res = await fetch('/api/store?_t=' + Date.now(), { cache: 'no-store' });
                 const data = await res.json();
                 storeProducts = data.products || [];
                 
@@ -2179,6 +2210,42 @@ const storefrontHTML = `<!DOCTYPE html>
                 initCfxUser();
             } catch (e) {
                 console.error('Failed to load store data:', e);
+            }
+        }
+
+        function initRealtimeFeed() {
+            try {
+                const sse = new EventSource('/api/events/live-feed');
+                sse.addEventListener('payment_received', (e) => {
+                    try {
+                        const payment = JSON.parse(e.data);
+                        const list = document.getElementById('recentPaymentsList');
+                        if (list) {
+                            const row = document.createElement('div');
+                            row.className = 'payment-row new-entry';
+                            row.innerHTML = \`
+                                <div class="payment-user">
+                                    <img class="payment-avatar" src="\${payment.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'}" alt="\${payment.buyer}" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'" />
+                                    <div class="payment-info">
+                                        <div class="name">\${payment.buyer}</div>
+                                        <div class="item">\${payment.item}</div>
+                                    </div>
+                                </div>
+                                <div class="payment-price">
+                                    <div>\${payment.price}</div>
+                                    <div class="payment-time">\${payment.time || 'Just now'}</div>
+                                </div>
+                            \`;
+                            list.insertBefore(row, list.firstChild);
+                        }
+                    } catch(err) {}
+                });
+                sse.addEventListener('store_updated', () => {
+                    console.log('⚡ Real-time store update received from Tebex! Updating UI...');
+                    loadStore();
+                });
+            } catch(e) {
+                console.warn('Real-time SSE connection failed:', e);
             }
         }
 
@@ -3931,17 +3998,21 @@ app.post('/api/admin/login', (req, res) => {
     res.json({ success: true, token });
 });
 
-// Public Storefront Catalog
+// Public Storefront Catalog (Real-Time Dynamic Sync)
 app.get('/api/store', async (req, res) => {
-    if (!cachedStoreData || Date.now() - lastSyncTime > 5000) {
-        await syncTebexStore();
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    if (!cachedStoreData || Date.now() - lastSyncTime > 2000 || req.query._t || req.query.fresh) {
+        await syncTebexStore(Boolean(req.query.fresh));
     }
     res.json(cachedStoreData);
 });
 
 app.get('/api/sync-tebex', async (req, res) => {
-    const data = await syncTebexStore();
-    res.json(data);
+    const data = await syncTebexStore(true);
+    broadcastEvent('store_updated', { timestamp: Date.now() });
+    res.json({ success: true, message: 'Storefront synchronized with Tebex in real-time', timestamp: Date.now(), productsCount: data.products?.length || 0 });
 });
 
 // Cryptographic Tebex Official Webhook Listener (HMAC-SHA256)
