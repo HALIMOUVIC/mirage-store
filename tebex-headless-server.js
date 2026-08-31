@@ -4014,7 +4014,7 @@ app.post('/api/webhooks/tebex', async (req, res) => {
             item: itemName,
             time: 'Just now',
             price: price,
-            avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80'
+            avatar: buyerName && buyerName !== 'Verified Customer' ? `https://forum.cfx.re/user_avatar/forum.cfx.re/${encodeURIComponent(buyerName)}/120/1.png` : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'
         };
 
         const config = loadStoreConfig();
