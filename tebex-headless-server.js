@@ -2238,7 +2238,8 @@ const storefrontHTML = `<!DOCTYPE html>
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         packageId: packageId || NOTARY_PACKAGE_ID,
-                        basketId: basketId 
+                        basketId: basketId,
+                        returnBaseUrl: window.location.origin
                     })
                 });
 
@@ -3131,18 +3132,27 @@ app.post('/api/admin/save', verifyAdminToken, (req, res) => {
 // Headless Checkout Creation Endpoint
 app.post('/api/create-checkout', async (req, res) => {
     try {
-        const { basketId, packageId } = req.body || {};
+        const { basketId, packageId, returnBaseUrl } = req.body || {};
         const targetPackageId = packageId || NOTARY_PACKAGE_ID;
         let basketIdent = basketId;
 
+        // Compute exact live host origin
+        const protocol = req.headers['x-forwarded-proto'] || (req.connection.encrypted ? 'https' : req.protocol) || 'https';
+        const host = req.headers['x-forwarded-host'] || req.get('host') || 'mirage-store-cnhn.onrender.com';
+        let liveOrigin = returnBaseUrl;
+        if (!liveOrigin || liveOrigin.includes('localhost')) {
+            liveOrigin = (!host.includes('localhost')) ? `${protocol}://${host}` : (process.env.BASE_URL || `http://localhost:${PORT}`);
+        }
+        if (!liveOrigin.startsWith('http')) liveOrigin = `https://${liveOrigin}`;
+
         if (!basketIdent) {
-            console.log(`[API] Creating new Tebex Headless basket...`);
+            console.log(`[API] Creating new Tebex Headless basket for origin: ${liveOrigin}...`);
             const basketReq = await fetch(`https://headless.tebex.io/api/accounts/${TEBEX_PUBLIC_TOKEN}/baskets`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    complete_url: `${BASE_URL}/`,
-                    cancel_url: `${BASE_URL}/`
+                    complete_url: `${liveOrigin}/`,
+                    cancel_url: `${liveOrigin}/`
                 })
             });
 
@@ -3172,8 +3182,9 @@ app.post('/api/create-checkout', async (req, res) => {
         const packageData = await packageReq.json().catch(() => null);
 
         if (packageReq.status === 422 && (packageData?.detail?.toLowerCase().includes('login') || packageData?.title?.toLowerCase().includes('payload'))) {
-            console.log(`[API] User login required for FiveM package. Fetching auth links...`);
-            const authReq = await fetch(`https://headless.tebex.io/api/accounts/${TEBEX_PUBLIC_TOKEN}/baskets/${basketIdent}/auth?returnUrl=${BASE_URL}/?basketId=${basketIdent}`);
+            console.log(`[API] User login required for FiveM package. Fetching auth links for ${liveOrigin}...`);
+            const encodedReturnUrl = encodeURIComponent(`${liveOrigin}/?basketId=${basketIdent}`);
+            const authReq = await fetch(`https://headless.tebex.io/api/accounts/${TEBEX_PUBLIC_TOKEN}/baskets/${basketIdent}/auth?returnUrl=${encodedReturnUrl}`);
             const authData = await authReq.json().catch(() => []);
             const authUrl = authData?.[0]?.url;
 

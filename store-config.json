@@ -4,7 +4,7 @@
   "discordUrl": "https://discord.gg/fivem",
   "packages": {
     "7642742": {
-      "youtubeUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "youtubeUrl": "https://www.youtube.com/watch?v=M7lc1UVf-VE",
       "framework": "QBCore / Qbox / ESX",
       "resmon": "0.00ms",
       "badge": "Bestseller",
@@ -13,7 +13,7 @@
       "docs": "### Installation Guide:\n1. Download the asset from [keymaster.fivem.net](https://keymaster.fivem.net).\n2. Place `notary_system` in your server resources.\n3. Ensure `Config.Banking` matches your banking script (`qbcore` or `okok`).\n4. Add `ensure notary_system` to your `server.cfg`."
     },
     "7642743": {
-      "youtubeUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "youtubeUrl": "https://www.youtube.com/watch?v=M7lc1UVf-VE",
       "framework": "All Frameworks / Standalone",
       "resmon": "0.01ms",
       "badge": "Ultra Optimized",
@@ -22,7 +22,7 @@
       "docs": "### Installation Guide:\n1. Download `onyx_dealership` from Keymaster.\n2. Add `ensure onyx_dealership` into `server.cfg`."
     },
     "7642744": {
-      "youtubeUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "youtubeUrl": "https://www.youtube.com/watch?v=M7lc1UVf-VE",
       "framework": "QBCore / Qbox / ESX",
       "resmon": "0.00ms",
       "badge": "Featured",
@@ -31,7 +31,7 @@
       "docs": "### Installation Guide:\n1. Add `police_cad` into server resources.\n2. Configure dispatch coordinates in `config.lua`."
     },
     "7642745": {
-      "youtubeUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "youtubeUrl": "https://www.youtube.com/watch?v=M7lc1UVf-VE",
       "framework": "Standalone (Add-on)",
       "resmon": "0.00ms",
       "badge": "15 Vehicles",
