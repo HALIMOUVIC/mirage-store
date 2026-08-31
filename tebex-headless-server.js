@@ -2160,8 +2160,22 @@ const storefrontHTML = `<!DOCTYPE html>
 
         function getYouTubeEmbed(url) {
             if (!url) return '';
-            const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-            return match ? 'https://www.youtube-nocookie.com/embed/' + match[1] : url;
+            try {
+                if (url.indexOf('youtu.be/') !== -1) {
+                    const id = url.split('youtu.be/')[1].split('?')[0].split('&')[0];
+                    return 'https://www.youtube-nocookie.com/embed/' + id;
+                }
+                if (url.indexOf('watch?v=') !== -1) {
+                    const id = url.split('watch?v=')[1].split('&')[0];
+                    return 'https://www.youtube-nocookie.com/embed/' + id;
+                }
+                if (url.indexOf('/embed/') !== -1) {
+                    return url;
+                }
+                return url;
+            } catch (e) {
+                return url;
+            }
         }
 
         function closeModal() {
