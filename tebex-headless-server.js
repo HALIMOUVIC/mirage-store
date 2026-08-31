@@ -238,7 +238,8 @@ async function syncTebexStore() {
                 slug: pkg.slug || 'package-' + pkg.id,
                 category: meta.category || 'scripts',
                 categoryName: meta.categoryName || (pkg.category ? pkg.category.name : 'Scripts & Systems'),
-                price: pkg.total_price || pkg.base_price || 35.00,
+                price: (typeof pkg.total_price === 'number') ? pkg.total_price : ((typeof pkg.base_price === 'number') ? pkg.base_price : (meta.price !== undefined ? meta.price : 0.00)),
+                currency: pkg.currency || 'USD',
                 isSubscription: pkg.type === 'subscription',
                 badge: meta.badge || 'Bestseller',
                 badgeColor: meta.badgeColor || 'accent',
@@ -2309,8 +2310,8 @@ const storefrontHTML = `<!DOCTYPE html>
                         
                         <div class="card-meta">
                             <div>
-                                <span class="card-price">$\${Number(p.price).toFixed(2)}</span>
-                                <span class="card-period">\${p.isSubscription ? '/ month' : 'one-time'}</span>
+                                <span class="card-price">\${Number(p.price) === 0 ? 'FREE' : ('$' + Number(p.price).toFixed(2))}</span>
+                                <span class="card-period">\${Number(p.price) === 0 ? '' : (p.isSubscription ? '/ month' : 'one-time')}</span>
                             </div>
                             <span class="framework-tag">\${p.framework}</span>
                         </div>
@@ -3156,7 +3157,9 @@ const adminHTML = `<!DOCTYPE html>
 function buildProductPageHTML(p, allProducts = [], allReviews = []) {
     const relatedProducts = allProducts.filter(item => String(item.id) !== String(p.id)).slice(0, 3);
     const isSub = p.isSubscription;
-    const priceFormatted = Number(p.price).toFixed(2);
+    const isFree = Number(p.price) === 0;
+    const priceFormatted = isFree ? 'FREE' : ('$' + Number(p.price).toFixed(2));
+    const pricePeriod = isFree ? '' : (isSub ? '/ month' : 'one-time');
     const mediaList = (p.media && p.media.length > 0) ? p.media : [p.image];
     const resourceName = (p.slug || p.name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'mirage_resource');
 
@@ -3537,8 +3540,8 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '                <p class="product-short-desc">' + p.shortDesc + '</p>' +
 '                <div class="price-box">' +
 '                    <div>' +
-'                        <span class="price-val">$' + priceFormatted + '</span>' +
-'                        <span class="price-period">' + (isSub ? '/ month' : 'one-time') + '</span>' +
+'                        <span class="price-val">' + priceFormatted + '</span>' +
+'                        <span class="price-period">' + pricePeriod + '</span>' +
 '                    </div>' +
 '                    <div class="price-stock">✓ In Stock & Instant Keymaster</div>' +
 '                </div>' +
@@ -3852,7 +3855,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/package/:id', async (req, res) => {
-    const store = cachedStoreData || await syncTebexStore();
+    const store = (!cachedStoreData || Date.now() - lastSyncTime > 5000) ? await syncTebexStore() : cachedStoreData;
     const pkg = (store?.products || []).find(p => String(p.id) === String(req.params.id) || p.slug === req.params.id);
     if (!pkg) {
         return res.redirect('/#products');
@@ -3930,7 +3933,7 @@ app.post('/api/admin/login', (req, res) => {
 
 // Public Storefront Catalog
 app.get('/api/store', async (req, res) => {
-    if (!cachedStoreData || Date.now() - lastSyncTime > 60000) {
+    if (!cachedStoreData || Date.now() - lastSyncTime > 5000) {
         await syncTebexStore();
     }
     res.json(cachedStoreData);
@@ -4108,8 +4111,7 @@ app.post('/api/create-checkout', async (req, res) => {
         let exactPath = returnPath || (targetPackageId ? `/package/${targetPackageId}` : '/');
         if (!exactPath.startsWith('/')) exactPath = `/${exactPath}`;
 
-        if (!basketIdent) {
-            console.log(`[API] Creating new Tebex Headless basket for origin: ${liveOrigin}${exactPath}...`);
+        async function fetchFreshBasket() {
             const basketReq = await fetch(`https://headless.tebex.io/api/accounts/${TEBEX_PUBLIC_TOKEN}/baskets`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -4118,19 +4120,15 @@ app.post('/api/create-checkout', async (req, res) => {
                     cancel_url: `${liveOrigin}${exactPath}`
                 })
             });
-
             const basketData = await basketReq.json().catch(() => null);
+            return basketData?.data?.ident || null;
+        }
 
-            if (!basketReq.ok || !basketData?.data?.ident) {
-                console.error('Tebex Basket Error:', basketData);
-                return res.status(400).json({ 
-                    error: 'Failed to create Tebex basket', 
-                    details: basketData 
-                });
+        if (!basketIdent) {
+            basketIdent = await fetchFreshBasket();
+            if (!basketIdent) {
+                return res.status(400).json({ error: 'Failed to create Tebex basket' });
             }
-
-            basketIdent = basketData.data.ident;
-            console.log(`[API] New Basket Created: ${basketIdent}`);
         }
 
         let packageReq = await fetch(`https://headless.tebex.io/api/baskets/${basketIdent}/packages`, {
@@ -4141,35 +4139,9 @@ app.post('/api/create-checkout', async (req, res) => {
                 quantity: 1
             })
         });
-
         let packageData = await packageReq.json().catch(() => null);
 
-        // If the basket expired or was invalid, auto-recover by creating a fresh basket
-        if (packageReq.status === 404 || packageData?.title?.toLowerCase().includes('not found') || packageData?.detail?.toLowerCase().includes('not found')) {
-            console.log(`[API] Basket ${basketIdent} expired or not found. Re-creating fresh basket...`);
-            const retryBasketReq = await fetch(`https://headless.tebex.io/api/accounts/${TEBEX_PUBLIC_TOKEN}/baskets`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    complete_url: `${liveOrigin}${exactPath}`,
-                    cancel_url: `${liveOrigin}${exactPath}`
-                })
-            });
-            const retryBasketData = await retryBasketReq.json().catch(() => null);
-            if (retryBasketData?.data?.ident) {
-                basketIdent = retryBasketData.data.ident;
-                packageReq = await fetch(`https://headless.tebex.io/api/baskets/${basketIdent}/packages`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        package_id: targetPackageId,
-                        quantity: 1
-                    })
-                });
-                packageData = await packageReq.json().catch(() => null);
-            }
-        }
-
+        // Check if user login is required
         if (packageReq.status === 422 && (packageData?.detail?.toLowerCase().includes('login') || packageData?.title?.toLowerCase().includes('payload') || packageData?.detail?.toLowerCase().includes('auth'))) {
             console.log(`[API] User login required for FiveM package. Fetching auth links for ${liveOrigin}${exactPath}...`);
             const encodedReturnUrl = encodeURIComponent(`${liveOrigin}${exactPath}?basketId=${basketIdent}&autoCheckout=1`);
@@ -4187,22 +4159,49 @@ app.post('/api/create-checkout', async (req, res) => {
             }
         }
 
+        // If package add failed because basket was cancelled/expired/broken, create a fresh basket and retry!
         if (!packageReq.ok && !(packageData?.detail?.toLowerCase().includes('already') || packageData?.detail?.toLowerCase().includes('again'))) {
-            if (packageData?.detail?.toLowerCase().includes('invalid')) {
+            let checkInfo = await fetch(`https://headless.tebex.io/api/accounts/${TEBEX_PUBLIC_TOKEN}/baskets/${basketIdent}`).then(r => r.json()).catch(() => null);
+            if (checkInfo?.data?.links?.checkout) {
                 return res.json({
-                    isUnpublished: true,
-                    message: 'This showcase package is not yet published to your live Tebex store.'
+                    checkoutUrl: checkInfo.data.links.checkout,
+                    basketIdent: basketIdent
                 });
             }
-            console.error('Tebex Package Error:', packageData);
-            return res.status(400).json({ 
-                error: packageData?.detail || packageData?.title || 'Failed to add item to basket',
-                details: packageData 
-            });
+
+            console.log(`[API] Auto-recovering: creating fresh basket for package ${targetPackageId}...`);
+            const freshIdent = await fetchFreshBasket();
+            if (freshIdent) {
+                basketIdent = freshIdent;
+                packageReq = await fetch(`https://headless.tebex.io/api/baskets/${basketIdent}/packages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        package_id: targetPackageId,
+                        quantity: 1
+                    })
+                });
+                packageData = await packageReq.json().catch(() => null);
+
+                if (packageReq.status === 422 && (packageData?.detail?.toLowerCase().includes('login') || packageData?.title?.toLowerCase().includes('payload') || packageData?.detail?.toLowerCase().includes('auth'))) {
+                    const encodedReturnUrl = encodeURIComponent(`${liveOrigin}${exactPath}?basketId=${basketIdent}&autoCheckout=1`);
+                    const authReq = await fetch(`https://headless.tebex.io/api/accounts/${TEBEX_PUBLIC_TOKEN}/baskets/${basketIdent}/auth?returnUrl=${encodedReturnUrl}`);
+                    const authData = await authReq.json().catch(() => []);
+                    const authUrl = authData?.[0]?.url;
+                    if (authUrl) {
+                        return res.json({
+                            requiresAuth: true,
+                            authUrl: authUrl,
+                            basketIdent: basketIdent,
+                            message: 'Authentication required with FiveM / Cfx.re'
+                        });
+                    }
+                }
+            }
         }
 
-        const basketInfoReq = await fetch(`https://headless.tebex.io/api/accounts/${TEBEX_PUBLIC_TOKEN}/baskets/${basketIdent}`);
-        const basketInfo = await basketInfoReq.json().catch(() => null);
+        const basketInfoReq = await fetch(`https://headless.tebex.io/api/accounts/${TEBEX_PUBLIC_TOKEN}/baskets/${basketIdent}`).catch(() => null);
+        const basketInfo = await basketInfoReq?.json().catch(() => null);
         const checkoutUrl = basketInfo?.data?.links?.checkout || `https://checkout.tebex.io/checkout/${basketIdent}`;
 
         res.json({
