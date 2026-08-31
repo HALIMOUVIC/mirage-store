@@ -253,106 +253,64 @@ async function syncTebexStore(force = false) {
         }
 
         const mergedProducts = tebexPackages.map(pkg => {
-            const meta = (config.packages && config.packages[String(pkg.id)]) || {};
-            
+            const desc = pkg.description || '';
+
+            // 1. Extract Gallery Images directly from Tebex Media API
             let mediaImages = [];
             if (pkg.media && Array.isArray(pkg.media)) {
-                mediaImages = pkg.media.filter(m => m.type === 'image').map(m => m.url);
+                mediaImages = pkg.media.filter(m => m.type === 'image' && m.url).map(m => m.url);
             }
-            if (pkg.id === NOTARY_PACKAGE_ID && fs.existsSync(path.join(__dirname, 'notary-banner.png'))) {
-                mediaImages.unshift('/notary-banner.png');
+            if (mediaImages.length === 0 && pkg.image) {
+                mediaImages.push(pkg.image);
             }
+
+            // 2. Extract YouTube video URL directly from Tebex description if present
+            const ytMatch = desc.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
+            const youtubeUrl = ytMatch ? ytMatch[0] : null;
+
+            // 3. Extract Frameworks mentioned in Tebex description
+            const fwList = [];
+            if (/qb-core|qbcore/i.test(desc)) fwList.push('QBCore');
+            if (/qbox/i.test(desc)) fwList.push('Qbox');
+            if (/esx/i.test(desc)) fwList.push('ESX');
+            if (/standalone/i.test(desc)) fwList.push('Standalone');
+            const detectedFramework = fwList.length > 0 ? fwList.join(' / ') : (pkg.category?.name || 'FiveM Asset');
+
+            // 4. Extract Resmon performance metric if mentioned in Tebex description
+            const resmonMatch = desc.match(/(\d+\.\d+\s*ms)/i);
+            const detectedResmon = resmonMatch ? resmonMatch[1] : '0.00ms';
+
+            // 5. Category classification
+            const catName = pkg.category?.name || pkg.category_name || 'Scripts & Systems';
+            let catSlug = 'scripts';
+            const catLower = catName.toLowerCase();
+            if (catLower.includes('mlo') || catLower.includes('interior') || catLower.includes('map')) catSlug = 'mlos';
+            else if (catLower.includes('vehic') || catLower.includes('car')) catSlug = 'vehicles';
+            else if (catLower.includes('script') || catLower.includes('package') || catLower.includes('system')) catSlug = 'scripts';
+
+            // 6. Real dynamic price
+            const realPrice = (typeof pkg.total_price === 'number') ? pkg.total_price : ((typeof pkg.base_price === 'number') ? pkg.base_price : 0.00);
 
             return {
                 id: pkg.id,
                 name: pkg.name,
-                slug: pkg.slug || 'package-' + pkg.id,
-                category: meta.category || (pkg.category ? (pkg.category.name.toLowerCase().includes('script') ? 'scripts' : (pkg.category.name.toLowerCase().includes('vehic') ? 'vehicles' : 'mlos')) : 'scripts'),
-                categoryName: meta.categoryName || (pkg.category ? pkg.category.name : (pkg.category_name || 'Scripts & Systems')),
-                price: (typeof pkg.total_price === 'number') ? pkg.total_price : ((typeof pkg.base_price === 'number') ? pkg.base_price : (meta.price !== undefined ? meta.price : 0.00)),
+                slug: pkg.slug || ('package-' + pkg.id),
+                category: catSlug,
+                categoryName: catName,
+                price: realPrice,
                 currency: pkg.currency || 'USD',
                 isSubscription: pkg.type === 'subscription',
-                badge: meta.badge || 'Bestseller',
-                badgeColor: meta.badgeColor || 'accent',
-                resmon: meta.resmon || '0.00ms',
-                framework: meta.framework || 'QBCore / Qbox / ESX',
-                image: (pkg.id === NOTARY_PACKAGE_ID) ? '/notary-banner.png' : (pkg.image || mediaImages[0] || '/notary-banner.png'),
-                media: mediaImages.length > 0 ? mediaImages : ['/notary-banner.png'],
-                youtubeUrl: meta.youtubeUrl || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                shortDesc: pkg.description ? pkg.description.replace(/<[^>]*>?/gm, '').substring(0, 150) + '...' : 'Premium FiveM script with automated CFX.re Escrow delivery.',
-                fullDesc: pkg.description || 'Comprehensive FiveM script with clean code, modern UI, and high performance.',
-                docs: meta.docs || '### Installation Guide\n1. Download asset from [keymaster.fivem.net](https://keymaster.fivem.net).\n2. Add resource into your resources directory.\n3. Add `ensure package_name` into `server.cfg`.'
+                badge: realPrice === 0 ? 'FREE' : 'Verified',
+                badgeColor: realPrice === 0 ? 'green' : 'brand',
+                resmon: detectedResmon,
+                framework: detectedFramework,
+                image: mediaImages[0] || pkg.image || '',
+                media: mediaImages,
+                youtubeUrl: youtubeUrl,
+                shortDesc: desc ? desc.replace(/<[^>]*>?/gm, '').substring(0, 150).trim() + '...' : '',
+                fullDesc: desc,
+                docs: desc
             };
-        });
-
-        const showcaseExtras = [
-            {
-                id: 7642743,
-                name: "Onyx Luxury Dealership MLO",
-                slug: "onyx-dealership-mlo",
-                category: "mlos",
-                categoryName: "MLOs & Interiors",
-                price: 45.00,
-                isSubscription: false,
-                badge: "Ultra Optimized",
-                badgeColor: "brand",
-                resmon: "0.01ms",
-                framework: "All Frameworks / Standalone",
-                image: "/public/images/dealership.jpg",
-                media: ["/public/images/dealership.jpg"],
-                youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-                shortDesc: "Two-floor modern luxury car showroom with revolving display podiums, VIP lounge, and underground tuning bay.",
-                fullDesc: "Designed for 0 texture loss. Features a massive main showroom floor with revolving display podiums, VIP client lounge, 4 executive management offices, an underground tuning garage, and custom LODs.",
-                docs: "### Installation\n1. Download `onyx_dealership` from Keymaster.\n2. Ensure in server.cfg."
-            },
-            {
-                id: 7642744,
-                name: "NextGen Police MDT / CAD",
-                slug: "police-mdt-cad",
-                category: "scripts",
-                categoryName: "Scripts & Systems",
-                price: 40.00,
-                isSubscription: false,
-                badge: "Featured",
-                badgeColor: "purple",
-                resmon: "0.00ms",
-                framework: "QBCore / Qbox / ESX",
-                image: "/public/images/police_cad.jpg",
-                media: ["/public/images/police_cad.jpg"],
-                youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-                shortDesc: "High-tech Mobile Data Terminal with live 911 dispatch, real-time GPS tracking, warrants, and bodycam feeds.",
-                fullDesc: "Complete law enforcement ecosystem with vector-based map tracking, 911 call center, auto-calculating penal code, and officer bodycams.",
-                docs: "### Installation\n1. Import SQL tables.\n2. Configure dispatch coords in config.lua."
-            },
-            {
-                id: 7642745,
-                name: "Underground Tuner & Supercar Pack",
-                slug: "underground-supercar-pack",
-                category: "vehicles",
-                categoryName: "Custom Vehicles",
-                price: 55.00,
-                isSubscription: false,
-                badge: "15 Vehicles",
-                badgeColor: "orange",
-                resmon: "0.00ms",
-                framework: "Standalone (Add-on)",
-                image: "/public/images/supercars.jpg",
-                media: ["/public/images/supercars.jpg"],
-                youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-                shortDesc: "Pack of 15 handcrafted tuner supercars and JDM street racers with realistic physics handling and custom engine audio.",
-                fullDesc: "15 highly detailed sports cars and supercars with custom engine sounds, 50+ body kits, and drift/grip handling presets.",
-                docs: "### Installation\n1. Place stream folder into server.\n2. Add ensure to server.cfg."
-            }
-        ];
-
-        showcaseExtras.forEach(extra => {
-            if (!mergedProducts.some(p => p.id === extra.id)) {
-                const extraMeta = (config.packages && config.packages[String(extra.id)]) || {};
-                mergedProducts.push({
-                    ...extra,
-                    ...extraMeta
-                });
-            }
         });
 
         // Try fetching real historical transactions from Tebex if Server Secret provided
