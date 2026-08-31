@@ -2184,6 +2184,14 @@ const storefrontHTML = `<!DOCTYPE html>
         function renderRecentPayments(payments) {
             const list = document.getElementById('recentPaymentsList');
             list.innerHTML = '';
+            if (!payments || payments.length === 0) {
+                list.innerHTML = \`
+                    <div style="text-align: center; padding: 0.75rem 0.5rem; font-size: 0.68rem; color: var(--text-dim);">
+                        <span>⚡ Live sync connected • Awaiting Tebex events</span>
+                    </div>
+                \`;
+                return;
+            }
             payments.forEach(p => {
                 const row = document.createElement('div');
                 row.className = 'payment-row';
