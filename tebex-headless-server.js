@@ -3119,6 +3119,15 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
     const mediaList = (p.media && p.media.length > 0) ? p.media : [p.image];
     const resourceName = (p.slug || p.name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'mirage_resource');
 
+    // Build media array for slider
+    const sliderMediaItems = [];
+    mediaList.forEach(imgUrl => {
+        sliderMediaItems.push({ type: 'image', url: imgUrl });
+    });
+    if (p.youtubeUrl) {
+        sliderMediaItems.push({ type: 'video', url: p.youtubeUrl });
+    }
+
     // Escape and format markdown documentation
     const formattedDocs = (p.docs || 'No extra documentation notes.')
         .replace(/&/g, '&amp;')
@@ -3133,18 +3142,19 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 
     // Build thumbnail strip items
     let thumbsHTML = '';
-    mediaList.forEach((mUrl, idx) => {
-        thumbsHTML += '<div class="p-thumb ' + (idx === 0 ? 'active' : '') + '" onclick="switchMedia(\'' + mUrl + '\', \'image\', this)">' +
-            '<img src="' + mUrl + '" alt="Thumbnail ' + (idx + 1) + '" />' +
-        '</div>';
+    sliderMediaItems.forEach((item, idx) => {
+        if (item.type === 'video') {
+            thumbsHTML += '<div class="p-thumb p-thumb-video" id="thumb-' + idx + '" onclick="goToSlide(' + idx + ')">' +
+                '<svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>' +
+                '<span>Trailer</span>' +
+            '</div>';
+        } else {
+            thumbsHTML += '<div class="p-thumb ' + (idx === 0 ? 'active' : '') + '" id="thumb-' + idx + '" onclick="goToSlide(' + idx + ')">' +
+                '<img src="' + item.url + '" alt="Thumbnail ' + (idx + 1) + '" />' +
+                '<span class="thumb-idx">' + (idx + 1) + '</span>' +
+            '</div>';
+        }
     });
-
-    if (p.youtubeUrl) {
-        thumbsHTML += '<div class="p-thumb p-thumb-video" onclick="switchMedia(\'' + p.youtubeUrl + '\', \'video\', this)">' +
-            '<svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>' +
-            '<span>Trailer</span>' +
-        '</div>';
-    }
 
     // Related cards HTML
     let relatedHTML = '';
@@ -3256,16 +3266,51 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '        .breadcrumbs span.current { color: #ffffff; font-weight: 700; }' +
 '        .product-layout { display: grid; grid-template-columns: 1.25fr 1fr; gap: 1.75rem; margin-bottom: 2rem; }' +
 '        @media (max-width: 980px) { .product-layout { grid-template-columns: 1fr; } }' +
+'        /* ==================== PROFESSIONAL PHOTO SLIDER ==================== */' +
 '        .media-showcase { display: flex; flex-direction: column; gap: 0.75rem; }' +
-'        .main-viewer-box { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; background: #070b14; border-radius: 14px; border: 1px solid var(--card-border); overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); }' +
-'        .main-viewer-box img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }' +
-'        .main-viewer-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }' +
-'        .thumbs-row { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.4rem; }' +
-'        .p-thumb { flex-shrink: 0; width: 74px; height: 46px; border-radius: 8px; overflow: hidden; border: 1.5px solid transparent; cursor: pointer; background: #070b14; transition: all 0.2s; position: relative; }' +
+'        .slider-viewer-container { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; background: #060a12; border-radius: 14px; border: 1px solid var(--card-border); overflow: hidden; box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5); user-select: none; }' +
+'        .slider-viewer-container:hover .slider-nav-btn { opacity: 1; transform: translateY(-50%) scale(1); }' +
+'        .slider-viewer-container:hover .slider-top-badge { opacity: 1; }' +
+'        .slider-content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: zoom-in; }' +
+'        .slider-content img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.25s ease-in-out, transform 0.3s ease; }' +
+'        .slider-content img:hover { transform: scale(1.015); }' +
+'        .slider-content iframe { width: 100%; height: 100%; border: none; }' +
+'        /* Slider Navigation Arrows */' +
+'        .slider-nav-btn { position: absolute; top: 50%; transform: translateY(-50%) scale(0.95); width: 42px; height: 42px; border-radius: 50%; background: rgba(12, 18, 34, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(56, 189, 248, 0.4); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10; box-shadow: 0 6px 20px rgba(0,0,0,0.6); }' +
+'        .slider-nav-btn:hover { background: var(--brand); border-color: var(--brand-light); color: #fff; box-shadow: 0 0 16px var(--brand-glow); transform: translateY(-50%) scale(1.08); }' +
+'        .slider-prev-btn { left: 12px; }' +
+'        .slider-next-btn { right: 12px; }' +
+'        /* Top Badges & Lightbox Button */' +
+'        .slider-top-left { position: absolute; top: 12px; left: 12px; z-index: 10; display: flex; gap: 0.5rem; }' +
+'        .slider-counter-pill { background: rgba(12, 18, 34, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.12); padding: 0.3rem 0.65rem; border-radius: 20px; font-size: 0.72rem; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 0.35rem; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }' +
+'        .slider-counter-pill svg { color: var(--brand-light); }' +
+'        .slider-top-right { position: absolute; top: 12px; right: 12px; z-index: 10; display: flex; gap: 0.5rem; }' +
+'        .slider-zoom-btn { background: rgba(12, 18, 34, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(56, 189, 248, 0.35); padding: 0.35rem 0.7rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 0.35rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }' +
+'        .slider-zoom-btn:hover { background: var(--brand); box-shadow: 0 0 12px var(--brand-glow); }' +
+'        /* Thumbnail Slider Bar */' +
+'        .thumb-carousel-wrapper { position: relative; display: flex; align-items: center; gap: 0.4rem; }' +
+'        .thumb-scroll-btn { width: 28px; height: 46px; border-radius: 6px; background: rgba(13, 21, 38, 0.9); border: 1px solid var(--card-border); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }' +
+'        .thumb-scroll-btn:hover { background: var(--brand); color: #fff; border-color: var(--brand-light); }' +
+'        .thumbs-row { display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.2rem 0; scroll-behavior: smooth; flex-grow: 1; }' +
+'        .p-thumb { flex-shrink: 0; width: 74px; height: 46px; border-radius: 8px; overflow: hidden; border: 2px solid transparent; cursor: pointer; background: #070b14; transition: all 0.2s; position: relative; }' +
 '        .p-thumb img { width: 100%; height: 100%; object-fit: cover; }' +
-'        .p-thumb:hover { border-color: rgba(56, 189, 248, 0.6); transform: translateY(-1px); }' +
-'        .p-thumb.active { border-color: var(--brand-light); box-shadow: 0 0 10px var(--brand-glow); }' +
+'        .p-thumb:hover { border-color: rgba(56, 189, 248, 0.6); transform: translateY(-2px); }' +
+'        .p-thumb.active { border-color: var(--brand-light); box-shadow: 0 0 12px var(--brand-glow); transform: scale(1.03); }' +
 '        .p-thumb-video { display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #111a30, #0369a1); color: #ffffff; font-size: 0.65rem; font-weight: 800; gap: 0.15rem; }' +
+'        .thumb-idx { position: absolute; bottom: 2px; right: 4px; font-size: 0.6rem; font-weight: 800; color: #fff; background: rgba(0,0,0,0.65); padding: 0.05rem 0.25rem; border-radius: 3px; }' +
+'        /* Fullscreen Lightbox Modal */' +
+'        .lightbox-modal { position: fixed; inset: 0; background: rgba(4, 7, 14, 0.95); backdrop-filter: blur(24px); z-index: 9999; display: none; align-items: center; justify-content: center; }' +
+'        .lightbox-modal.active { display: flex; }' +
+'        .lightbox-img-wrapper { position: relative; max-width: 90vw; max-height: 85vh; display: flex; align-items: center; justify-content: center; }' +
+'        .lightbox-img-wrapper img { max-width: 100%; max-height: 85vh; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.8); }' +
+'        .lightbox-close-btn { position: absolute; top: 20px; right: 24px; width: 44px; height: 44px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }' +
+'        .lightbox-close-btn:hover { background: #ef4444; border-color: #ef4444; }' +
+'        .lightbox-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; border-radius: 50%; background: rgba(12, 18, 34, 0.85); border: 1px solid rgba(56, 189, 248, 0.4); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }' +
+'        .lightbox-nav-btn:hover { background: var(--brand); }' +
+'        .lightbox-prev { left: 24px; }' +
+'        .lightbox-next { right: 24px; }' +
+'        .lightbox-counter { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(12, 18, 34, 0.85); border: 1px solid rgba(255,255,255,0.15); padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: 800; color: #fff; }' +
+'        /* Right column info card */' +
 '        .info-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.15rem; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35); }' +
 '        .top-tags { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }' +
 '        .badge-pill { padding: 0.25rem 0.65rem; border-radius: 6px; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; }' +
@@ -3408,12 +3453,44 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '            </div>' +
 '        </div>' +
 '        <div class="product-layout">' +
+'            <!-- ================= LEFT: PROFESSIONAL PHOTO SLIDER ================= -->' +
 '            <div class="media-showcase">' +
-'                <div class="main-viewer-box" id="mainViewer">' +
-'                    <img id="mainImg" src="' + mediaList[0] + '" alt="' + p.name + '" />' +
+'                <div class="slider-viewer-container" id="sliderViewerContainer">' +
+'                    <div class="slider-top-left">' +
+'                        <div class="slider-counter-pill">' +
+'                            <svg width="13" height="13" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/></svg>' +
+'                            <span id="slideCounterText">1 / ' + sliderMediaItems.length + '</span>' +
+'                        </div>' +
+'                    </div>' +
+'                    <div class="slider-top-right">' +
+'                        <button class="slider-zoom-btn" onclick="openLightbox()">' +
+'                            <svg width="13" height="13" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l3.293 3.293a1 1 0 01-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 11-2 0V6.414l-3.293 3.293a1 1 0 11-1.414-1.414L13.586 5H12a1 1 0 01-1-1zM5 12a1 1 0 011 1v1.586l3.293-3.293a1 1 0 011.414 1.414L7.414 16H9a1 1 0 110 2H5a1 1 0 01-1-1v-4a1 1 0 011-1zm10 0a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 110-2h1.586l-3.293-3.293a1 1 0 011.414-1.414L15 14.586V13a1 1 0 011-1z" clip-rule="evenodd"/></svg>' +
+'                            <span>Expand</span>' +
+'                        </button>' +
+'                    </div>' +
+'                    <div class="slider-content" id="mainViewer" onclick="handleMainViewerClick()">' +
+'                        <img id="mainImg" src="' + sliderMediaItems[0].url + '" alt="' + p.name + '" />' +
+'                    </div>' +
+'                    <!-- Floating Slider Prev/Next Arrows -->' +
+'                    <button class="slider-nav-btn slider-prev-btn" onclick="sliderPrev(event)" aria-label="Previous photo">' +
+'                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>' +
+'                    </button>' +
+'                    <button class="slider-nav-btn slider-next-btn" onclick="sliderNext(event)" aria-label="Next photo">' +
+'                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>' +
+'                    </button>' +
 '                </div>' +
-'                <div class="thumbs-row custom-scroll" id="thumbsStrip">' + thumbsHTML + '</div>' +
+'                <!-- Thumbnail Carousel with Arrows -->' +
+'                <div class="thumb-carousel-wrapper">' +
+'                    <button class="thumb-scroll-btn" onclick="scrollThumbs(-150)" aria-label="Scroll thumbnails left">' +
+'                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>' +
+'                    </button>' +
+'                    <div class="thumbs-row custom-scroll" id="thumbsStrip">' + thumbsHTML + '</div>' +
+'                    <button class="thumb-scroll-btn" onclick="scrollThumbs(150)" aria-label="Scroll thumbnails right">' +
+'                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>' +
+'                    </button>' +
+'                </div>' +
 '            </div>' +
+'            <!-- ================= RIGHT: INFO & ACTION CARD ================= -->' +
 '            <div class="info-box">' +
 '                <div class="top-tags">' +
 '                    <span class="badge-pill ' + p.badgeColor + '">' + p.badge + '</span>' +
@@ -3453,6 +3530,7 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '                </div>' +
 '            </div>' +
 '        </div>' +
+'        <!-- ================= TABS WRAPPER ================= -->' +
 '        <div class="tabs-wrapper">' +
 '            <div class="tabs-header">' +
 '                <button class="tab-btn active" onclick="switchTab(\'desc\', this)">' +
@@ -3562,21 +3640,98 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '        <h2 class="section-header">You May Also Like</h2>' +
 '        <div class="related-grid">' + relatedHTML + '</div>' +
 '    </div>' +
+'    <!-- ================= FULLSCREEN LIGHTBOX MODAL ================= -->' +
+'    <div id="lightboxModal" class="lightbox-modal" onclick="handleLightboxBackdropClick(event)">' +
+'        <button class="lightbox-close-btn" onclick="closeLightbox()" aria-label="Close Lightbox">✕</button>' +
+'        <button class="lightbox-nav-btn lightbox-prev" onclick="sliderPrev(event)" aria-label="Previous image">‹</button>' +
+'        <div class="lightbox-img-wrapper">' +
+'            <img id="lightboxImg" src="' + sliderMediaItems[0].url + '" alt="Full size preview" />' +
+'        </div>' +
+'        <button class="lightbox-nav-btn lightbox-next" onclick="sliderNext(event)" aria-label="Next image">›</button>' +
+'        <div class="lightbox-counter" id="lightboxCounter">1 / ' + sliderMediaItems.length + '</div>' +
+'    </div>' +
 '    <footer class="footer"><p>© 2026 Mirage Store Enterprise. All rights reserved. Not affiliated with Rockstar Games or Take-Two Interactive.</p></footer>' +
 '    <script>' +
-'        function switchMedia(url, type, element) {' +
-'            const viewer = document.getElementById("mainViewer");' +
-'            document.querySelectorAll(".p-thumb").forEach(function(el) { el.classList.remove("active"); });' +
-'            if (element) element.classList.add("active");' +
-'            if (type === "video") {' +
+'        var sliderItems = ' + JSON.stringify(sliderMediaItems) + ';' +
+'        var currentSlideIdx = 0;' +
+'        function updateSliderView() {' +
+'            var item = sliderItems[currentSlideIdx];' +
+'            var viewer = document.getElementById("mainViewer");' +
+'            var counterText = document.getElementById("slideCounterText");' +
+'            var lightboxImg = document.getElementById("lightboxImg");' +
+'            var lightboxCounter = document.getElementById("lightboxCounter");' +
+'            if (counterText) counterText.innerText = (currentSlideIdx + 1) + " / " + sliderItems.length;' +
+'            if (lightboxCounter) lightboxCounter.innerText = (currentSlideIdx + 1) + " / " + sliderItems.length;' +
+'            if (item.type === "video") {' +
 '                var id = "M7lc1UVf-VE";' +
-'                if (url.indexOf("v=") !== -1) id = url.split("v=")[1].split("&")[0];' +
-'                else if (url.indexOf("youtu.be/") !== -1) id = url.split("youtu.be/")[1].split("?")[0];' +
-'                else if (url.indexOf("/embed/") !== -1) id = url.split("/embed/")[1].split("?")[0];' +
-'                viewer.innerHTML = "<iframe width=\'100%\' height=\'100%\' src=\'https://www.youtube.com/embed/" + id + "?autoplay=1&enablejsapi=1&rel=0\' frameborder=\'0\' allow=\'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\' referrerpolicy=\'strict-origin-when-cross-origin\' allowfullscreen></iframe>";' +
+'                if (item.url.indexOf("v=") !== -1) id = item.url.split("v=")[1].split("&")[0];' +
+'                else if (item.url.indexOf("youtu.be/") !== -1) id = item.url.split("youtu.be/")[1].split("?")[0];' +
+'                else if (item.url.indexOf("/embed/") !== -1) id = item.url.split("/embed/")[1].split("?")[0];' +
+'                if (viewer) viewer.innerHTML = "<iframe width=\'100%\' height=\'100%\' src=\'https://www.youtube.com/embed/" + id + "?autoplay=1&enablejsapi=1&rel=0\' frameborder=\'0\' allow=\'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\' referrerpolicy=\'strict-origin-when-cross-origin\' allowfullscreen></iframe>";' +
 '            } else {' +
-'                viewer.innerHTML = "<img id=\'mainImg\' src=\'" + url + "\' alt=\'Showcase Media\' />";' +
+'                if (viewer) viewer.innerHTML = "<img id=\'mainImg\' src=\'" + item.url + "\' alt=\'Showcase Screenshot\' />";' +
+'                if (lightboxImg) lightboxImg.src = item.url;' +
 '            }' +
+'            document.querySelectorAll(".p-thumb").forEach(function(el, i) {' +
+'                if (i === currentSlideIdx) {' +
+'                    el.classList.add("active");' +
+'                    el.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });' +
+'                } else {' +
+'                    el.classList.remove("active");' +
+'                }' +
+'            });' +
+'        }' +
+'        function goToSlide(idx) {' +
+'            if (idx >= 0 && idx < sliderItems.length) {' +
+'                currentSlideIdx = idx;' +
+'                updateSliderView();' +
+'            }' +
+'        }' +
+'        function sliderNext(e) {' +
+'            if (e) e.stopPropagation();' +
+'            currentSlideIdx = (currentSlideIdx + 1) % sliderItems.length;' +
+'            updateSliderView();' +
+'        }' +
+'        function sliderPrev(e) {' +
+'            if (e) e.stopPropagation();' +
+'            currentSlideIdx = (currentSlideIdx - 1 + sliderItems.length) % sliderItems.length;' +
+'            updateSliderView();' +
+'        }' +
+'        function scrollThumbs(amt) {' +
+'            var strip = document.getElementById("thumbsStrip");' +
+'            if (strip) strip.scrollBy({ left: amt, behavior: "smooth" });' +
+'        }' +
+'        function handleMainViewerClick() {' +
+'            if (sliderItems[currentSlideIdx].type === "image") {' +
+'                openLightbox();' +
+'            }' +
+'        }' +
+'        function openLightbox() {' +
+'            if (sliderItems[currentSlideIdx].type === "image") {' +
+'                var modal = document.getElementById("lightboxModal");' +
+'                if (modal) modal.classList.add("active");' +
+'            }' +
+'        }' +
+'        function closeLightbox() {' +
+'            var modal = document.getElementById("lightboxModal");' +
+'            if (modal) modal.classList.remove("active");' +
+'        }' +
+'        function handleLightboxBackdropClick(e) {' +
+'            if (e.target && e.target.id === "lightboxModal") {' +
+'                closeLightbox();' +
+'            }' +
+'        }' +
+'        window.addEventListener("keydown", function(e) {' +
+'            if (e.key === "ArrowLeft") sliderPrev();' +
+'            else if (e.key === "ArrowRight") sliderNext();' +
+'            else if (e.key === "Escape") closeLightbox();' +
+'        });' +
+'        /* Touch swipe detection for mobile */' +
+'        var touchStartX = 0;' +
+'        var sliderEl = document.getElementById("sliderViewerContainer");' +
+'        if (sliderEl) {' +
+'            sliderEl.addEventListener("touchstart", function(e) { touchStartX = e.changedTouches[0].screenX; }, {passive: true});' +
+'            sliderEl.addEventListener("touchend", function(e) { var touchEndX = e.changedTouches[0].screenX; if (touchEndX < touchStartX - 40) sliderNext(); if (touchEndX > touchStartX + 40) sliderPrev(); }, {passive: true});' +
 '        }' +
 '        function switchTab(tabId, element) {' +
 '            document.querySelectorAll(".tab-btn").forEach(function(btn) { btn.classList.remove("active"); });' +
@@ -3697,7 +3852,14 @@ function buildProductPageHTML(p, allProducts = [], allReviews = []) {
 '            renderCfxUser(null);' +
 '            window.location.reload();' +
 '        }' +
-'        window.addEventListener("DOMContentLoaded", initCfxUser);' +
+'        window.addEventListener("DOMContentLoaded", function() {' +
+'            initCfxUser();' +
+'            var sEl = document.getElementById("sliderViewerContainer");' +
+'            if (sEl) {' +
+'                sEl.addEventListener("touchstart", function(e) { touchStartX = e.changedTouches[0].screenX; }, {passive: true});' +
+'                sEl.addEventListener("touchend", function(e) { var touchEndX = e.changedTouches[0].screenX; if (touchEndX < touchStartX - 40) sliderNext(); if (touchEndX > touchStartX + 40) sliderPrev(); }, {passive: true});' +
+'            }' +
+'        });' +
 '    </script>' +
 '</body>' +
 '</html>';
