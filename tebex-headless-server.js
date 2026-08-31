@@ -654,31 +654,43 @@ const storefrontHTML = `<!DOCTYPE html>
 
         .cfx-dropdown-menu {
             position: absolute;
-            top: calc(100% + 8px);
+            top: 100%;
             right: 0;
-            width: 210px;
-            background: rgba(7, 11, 20, 0.96);
-            border: 1px solid var(--card-border);
+            width: 220px;
+            background: rgba(7, 11, 20, 0.98);
+            border: 1px solid rgba(56, 189, 248, 0.25);
             border-radius: 14px;
             padding: 0.5rem;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(20px);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.8), 0 0 20px rgba(2, 132, 199, 0.15);
+            backdrop-filter: blur(24px);
             display: none;
             flex-direction: column;
             gap: 0.35rem;
             z-index: 100;
+            margin-top: 6px;
         }
 
-        .cfx-profile-dropdown:hover .cfx-dropdown-menu {
+        /* Invisible hover bridge to prevent menu from hiding when moving cursor */
+        .cfx-dropdown-menu::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 0;
+            right: 0;
+            height: 12px;
+        }
+
+        .cfx-profile-dropdown:hover .cfx-dropdown-menu,
+        .cfx-dropdown-menu:hover {
             display: flex;
         }
 
         .cfx-menu-item {
             display: flex;
             align-items: center;
-            gap: 0.6rem;
-            padding: 0.6rem 0.85rem;
-            border-radius: 8px;
+            gap: 0.65rem;
+            padding: 0.65rem 0.85rem;
+            border-radius: 10px;
             font-size: 0.82rem;
             font-weight: 700;
             color: var(--text-main);
@@ -691,16 +703,30 @@ const storefrontHTML = `<!DOCTYPE html>
             transition: all 0.2s;
         }
 
-        .cfx-menu-item:hover {
-            background: rgba(255, 255, 255, 0.08);
+        .cfx-menu-item svg {
+            flex-shrink: 0;
             color: var(--brand-light);
+            transition: transform 0.2s;
+        }
+
+        .cfx-menu-item:hover {
+            background: rgba(2, 132, 199, 0.15);
+            color: var(--brand-light);
+        }
+
+        .cfx-menu-item:hover svg {
+            transform: scale(1.1);
         }
 
         .cfx-logout-btn {
             color: #f87171 !important;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
             margin-top: 0.25rem;
             padding-top: 0.65rem;
+        }
+
+        .cfx-logout-btn svg {
+            color: #f87171 !important;
         }
 
         .cfx-logout-btn:hover {
@@ -1709,10 +1735,16 @@ const storefrontHTML = `<!DOCTYPE html>
                         </div>
                         <div class="cfx-dropdown-menu">
                             <a href="https://keymaster.fivem.net" target="_blank" class="cfx-menu-item">
-                                <span>🔑 My Keymaster Assets</span>
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>My Keymaster Assets</span>
                             </a>
                             <button class="cfx-menu-item cfx-logout-btn" onclick="logoutCfx()">
-                                <span>🚪 Log Out</span>
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Log Out</span>
                             </button>
                         </div>
                     </div>
