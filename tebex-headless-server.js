@@ -335,7 +335,6 @@ async function syncTebexStore(force = false) {
         }
 
         const allReviews = [...(config.customReviews || []), ...defaultReviews];
-        const allPayments = liveTebexPayments;
 
         cachedStoreData = {
             announcement: config.announcement,
@@ -343,7 +342,7 @@ async function syncTebexStore(force = false) {
             topSupporter: config.topSupporter || { name: "URSU ARTS", title: "Top Supporter of the Month", amount: "$240.00" },
             products: mergedProducts,
             reviews: allReviews,
-            recentPayments: allPayments,
+            recentPayments: [],
             partners: partnerServers
         };
         lastSyncTime = Date.now();
@@ -760,33 +759,16 @@ const storefrontHTML = `<!DOCTYPE html>
             padding: 4.5rem 3.5rem;
             width: 100%;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            gap: 2rem;
         }
 
         .hero-left-content {
-            max-width: 620px;
-            flex-shrink: 0;
-        }
-
-        .hero-right-widget {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            flex-grow: 1;
+            max-width: 820px;
         }
 
         @media (max-width: 1100px) {
             .hero-container {
-                flex-direction: column;
-                align-items: flex-start;
                 padding: 3rem 1.5rem;
-            }
-            .hero-right-widget {
-                width: 100%;
-                justify-content: flex-start;
-                margin-top: 1.5rem;
             }
             .gta-hero { min-height: auto; }
         }
@@ -882,125 +864,7 @@ const storefrontHTML = `<!DOCTYPE html>
             transform: translateY(-2px);
         }
 
-        /* Real Recent Payments Widget with Sleek Compact Design Positioned to the Right */
-        .recent-payments-card {
-            background: rgba(10, 16, 30, 0.88);
-            border: 1px solid rgba(56, 189, 248, 0.22);
-            border-radius: 14px;
-            padding: 0.9rem 1.1rem;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 24px -8px var(--brand-glow);
-            width: 100%;
-            max-width: 320px;
-            margin-left: auto;
-        }
 
-        .payments-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 0.6rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            margin-bottom: 0.65rem;
-        }
-
-        .payments-header-title {
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-            font-size: 0.68rem;
-            font-weight: 800;
-            color: #ffffff;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        .live-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #22c55e;
-            box-shadow: 0 0 8px #22c55e;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(0.95); opacity: 0.8; }
-        }
-
-        .payments-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.45rem;
-        }
-
-        .payment-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(22, 33, 58, 0.45);
-            border: 1px solid rgba(148, 163, 184, 0.12);
-            padding: 0.4rem 0.6rem;
-            border-radius: 8px;
-            transition: all 0.25s ease;
-        }
-
-        .payment-row.new-entry {
-            animation: highlightEntry 1.5s ease;
-        }
-
-        @keyframes highlightEntry {
-            from { background: rgba(56, 189, 248, 0.35); border-color: var(--brand-light); }
-            to { background: rgba(22, 33, 58, 0.45); }
-        }
-
-        .payment-row:hover {
-            transform: translateX(3px);
-            border-color: rgba(56, 189, 248, 0.35);
-            background: rgba(22, 33, 58, 0.75);
-        }
-
-        .payment-user {
-            display: flex;
-            align-items: center;
-            gap: 0.45rem;
-        }
-
-        .payment-avatar {
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
-            object-fit: cover;
-        }
-
-        .payment-info .name {
-            font-size: 0.7rem;
-            font-weight: 800;
-            color: #ffffff;
-            line-height: 1.1;
-        }
-
-        .payment-info .item {
-            font-size: 0.62rem;
-            color: var(--text-muted);
-            line-height: 1.1;
-        }
-
-        .payment-price {
-            text-align: right;
-            font-size: 0.7rem;
-            font-weight: 800;
-            color: var(--brand-light);
-            line-height: 1.1;
-        }
-
-        .payment-time {
-            font-size: 0.58rem;
-            color: var(--text-dim);
-            line-height: 1.1;
-        }
 
         /* Modern Compact Stats Bar with Standard Small Text */
         .stats-bar {
@@ -1798,20 +1662,6 @@ const storefrontHTML = `<!DOCTYPE html>
                 </div>
             </div>
 
-            <!-- Real-Time Live Feed Card Placed on Far Right -->
-            <div class="hero-right-widget">
-                <div class="recent-payments-card">
-                    <div class="payments-header">
-                        <div class="payments-header-title">
-                            <span class="live-dot"></span>
-                            <span>LIVE PAYMENTS FEED</span>
-                        </div>
-                        <span style="font-size: 0.65rem; color: var(--brand-light); font-weight: 700;">MIRAGESTORE.TEBEX.IO</span>
-                    </div>
-
-                    <div class="payments-list" id="recentPaymentsList"></div>
-                </div>
-            </div>
         </div>
     </section>
 
@@ -2151,7 +2001,6 @@ const storefrontHTML = `<!DOCTYPE html>
                     if (dLink) dLink.href = data.discordUrl;
                 }
 
-                renderRecentPayments(data.recentPayments || []);
                 renderProducts(storeProducts);
                 renderReviews(data.reviews || []);
                 populateReviewSelect(storeProducts);
@@ -2164,30 +2013,6 @@ const storefrontHTML = `<!DOCTYPE html>
         function initRealtimeFeed() {
             try {
                 const sse = new EventSource('/api/events/live-feed');
-                sse.addEventListener('payment_received', (e) => {
-                    try {
-                        const payment = JSON.parse(e.data);
-                        const list = document.getElementById('recentPaymentsList');
-                        if (list) {
-                            const row = document.createElement('div');
-                            row.className = 'payment-row new-entry';
-                            row.innerHTML = \`
-                                <div class="payment-user">
-                                    <img class="payment-avatar" src="\${payment.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'}" alt="\${payment.buyer}" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'" />
-                                    <div class="payment-info">
-                                        <div class="name">\${payment.buyer}</div>
-                                        <div class="item">\${payment.item}</div>
-                                    </div>
-                                </div>
-                                <div class="payment-price">
-                                    <div>\${payment.price}</div>
-                                    <div class="payment-time">\${payment.time || 'Just now'}</div>
-                                </div>
-                            \`;
-                            list.insertBefore(row, list.firstChild);
-                        }
-                    } catch(err) {}
-                });
                 sse.addEventListener('store_updated', () => {
                     console.log('⚡ Real-time store update received from Tebex! Updating UI...');
                     loadStore();
@@ -2195,37 +2020,6 @@ const storefrontHTML = `<!DOCTYPE html>
             } catch(e) {
                 console.warn('Real-time SSE connection failed:', e);
             }
-        }
-
-        function renderRecentPayments(payments) {
-            const list = document.getElementById('recentPaymentsList');
-            list.innerHTML = '';
-            if (!payments || payments.length === 0) {
-                list.innerHTML = \`
-                    <div style="text-align: center; padding: 0.75rem 0.5rem; font-size: 0.68rem; color: var(--text-dim);">
-                        <span>⚡ Live sync connected • Awaiting Tebex events</span>
-                    </div>
-                \`;
-                return;
-            }
-            payments.forEach(p => {
-                const row = document.createElement('div');
-                row.className = 'payment-row';
-                row.innerHTML = \`
-                    <div class="payment-user">
-                        <img class="payment-avatar" src="\${p.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'}" alt="\${p.buyer}" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'" />
-                        <div class="payment-info">
-                            <div class="name">\${p.buyer}</div>
-                            <div class="item">\${p.item}</div>
-                        </div>
-                    </div>
-                    <div class="payment-price">
-                        <div>\${p.price}</div>
-                        <div class="payment-time">\${p.time}</div>
-                    </div>
-                \`;
-                list.appendChild(row);
-            });
         }
 
         function renderReviews(reviews) {
@@ -4010,6 +3804,7 @@ app.post('/api/webhooks/tebex', async (req, res) => {
                 avatar: buyerName && buyerName !== 'Verified Customer' ? `https://forum.cfx.re/user_avatar/forum.cfx.re/${encodeURIComponent(buyerName)}/120/1.png` : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'
             };
 
+            inMemoryLivePayments.unshift(newPayment);
             cachedStoreData = null;
 
             // Broadcast to all active browsers in real-time
