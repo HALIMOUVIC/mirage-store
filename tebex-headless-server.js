@@ -36,7 +36,6 @@ const startTime = Date.now();
 // 2. Real-Time Event Hub (Server-Sent Events / SSE)
 // ===================================================
 const sseClients = new Set();
-const inMemoryLivePayments = [];
 
 function broadcastEvent(eventType, payload) {
     const data = JSON.stringify({ type: eventType, payload, timestamp: Date.now() });
@@ -336,13 +335,7 @@ async function syncTebexStore(force = false) {
         }
 
         const allReviews = [...(config.customReviews || []), ...defaultReviews];
-        const paymentMap = new Map();
-        [...inMemoryLivePayments, ...liveTebexPayments].forEach(p => {
-            if (p && p.buyer && !paymentMap.has(p.id || (p.buyer + p.item))) {
-                paymentMap.set(p.id || (p.buyer + p.item), p);
-            }
-        });
-        const allPayments = Array.from(paymentMap.values());
+        const allPayments = liveTebexPayments;
 
         cachedStoreData = {
             announcement: config.announcement,
@@ -4017,11 +4010,6 @@ app.post('/api/webhooks/tebex', async (req, res) => {
                 avatar: buyerName && buyerName !== 'Verified Customer' ? `https://forum.cfx.re/user_avatar/forum.cfx.re/${encodeURIComponent(buyerName)}/120/1.png` : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'
             };
 
-            inMemoryLivePayments.unshift(newPayment);
-            const config = loadStoreConfig();
-            if (!config.realPayments) config.realPayments = [];
-            config.realPayments.unshift(newPayment);
-            saveStoreConfig(config);
             cachedStoreData = null;
 
             // Broadcast to all active browsers in real-time
